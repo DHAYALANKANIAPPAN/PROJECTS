@@ -1,7 +1,6 @@
 import java.sql.*;
 import java.util.Scanner;
 import java.io.*;
-
 public class App {
     private static final String URL = "jdbc:mysql://localhost:3306/dhaya";
     private static final String USERNAME = "root";
