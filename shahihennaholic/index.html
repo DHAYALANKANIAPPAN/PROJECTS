@@ -3,109 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shahi Hennaholic | Premium Organic Mehndi</title>
+    <title>Shahi Henna | Organic Mehndi Artistry</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Poppins', sans-serif; background:#fffaf5; color:#3d2314; }
+        body { font-family:'Poppins', sans-serif; background:#fffaf5; color:#3d2314; padding-top:100px; }
         
-        /* NAVBAR */
-        .navbar { position:fixed; top:0; width:100%; z-index:1000; background:#611c05; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 4rem; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
-        .logo { color:#fcdfa9; font-family:'Playfair Display', serif; font-size:2.2rem; font-weight:700; text-decoration:none; }
-        .nav-links { display:flex; gap:2.5rem; }
-        .nav-links a { text-decoration:none; color:#fff; font-weight:500; transition:0.3s; font-size:1.05rem; }
-        .nav-links a:hover, .nav-links a.active { color:#fcdfa9; }
+        .navbar { position:fixed; top:0; width:100%; z-index:1000; background:#4a2312; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 4rem; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+        .logo { color:#fcdfa9; font-family:'Playfair Display', serif; font-size:2rem; font-weight:700; text-decoration:none; }
+        .nav-links { display:flex; gap:1.5rem; }
+        .nav-links a { text-decoration:none; color:#fff; font-weight:500; padding:0.6rem 1.2rem; border-radius:20px; transition:0.3s; font-size:0.95rem; border:1px solid transparent; }
+        .nav-links a:hover, .nav-links a.active { background:#fffaf5; color:#4a2312; border-color:#fffaf5; }
 
-        /* HERO */
-        .hero { height:75vh; background: linear-gradient(rgba(48, 12, 1, 0.5), rgba(48, 12, 1, 0.6)), url("images/bridal.jpg") no-repeat center center/cover; display:flex; justify-content:center; align-items:center; flex-direction:column; text-align:center; color:white; padding:2rem; margin-top:70px; }
-        .hero h1 { font-family:'Playfair Display', serif; font-size:4.5rem; color:#fcdfa9; margin-bottom:1rem; text-shadow:2px 2px 8px rgba(0,0,0,0.5); }
-        .hero p { font-size:1.4rem; max-width:750px; font-weight:300; line-height:1.8; }
+        .hero { height:55vh; background: linear-gradient(rgba(48, 12, 1, 0.55), rgba(48, 12, 1, 0.65)), url("images/Bridal Mehandi designs.jpeg") no-repeat center center/cover; display:flex; justify-content:center; align-items:center; flex-direction:column; text-align:center; color:white; padding:2rem; margin-bottom:2rem; }
+        .hero h1 { font-family:'Playfair Display', serif; font-size:4rem; color:#fcdfa9; margin-bottom:1rem; text-shadow:2px 2px 10px rgba(0,0,0,0.6); }
+        .hero p { font-size:1.3rem; max-width:750px; font-weight:300; text-shadow:1px 1px 5px rgba(0,0,0,0.5); }
 
-        /* APPETIZING GRID SECTIONS */
-        .main-container { padding:5rem 8%; display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:3rem; }
-        .category-card { background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 12px 25px rgba(97,28,5,0.08); transition:0.4s; display:flex; flex-direction:column; border:1px solid #f5eae1; }
-        .category-card:hover { transform:translateY(-8px); box-shadow:0 15px 35px rgba(97,28,5,0.15); }
-        .card-img { width:100%; height:260px; object-fit:cover; }
-        .card-content { padding:2rem; display:flex; flex-direction:column; flex-grow:1; text-align:center; }
-        .card-content h2 { font-family:'Playfair Display', serif; font-size:1.8rem; color:#802204; margin-bottom:1rem; }
-        .card-content p { color:#66554e; line-height:1.7; font-size:1rem; margin-bottom:2rem; flex-grow:1; }
+        .section-title { text-align:center; margin:3rem 0 2rem 0; font-family:'Playfair Display', serif; font-size:2.5rem; color:#4a2312; }
+
+        .main-container { padding:0 8% 5rem 8%; display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:2.5rem; }
+        .category-card { background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 12px 25px rgba(97,28,5,0.05); transition:0.4s; display:flex; flex-direction:column; border:1px solid #f5eae1; text-align:center; }
+        .category-card:hover { transform:translateY(-8px); box-shadow:0 15px 35px rgba(97,28,5,0.12); }
+        .card-img { width:100%; height:280px; object-fit:cover; }
+        .card-content { padding:2rem; display:flex; flex-direction:column; flex-grow:1; }
+        .card-content h2 { font-family:'Playfair Display', serif; font-size:1.5rem; color:#4a2312; margin-bottom:1.5rem; }
         
-        /* COLORFUL BUTTONS */
-        .btn { display:inline-block; padding:0.8rem 1.8rem; border-radius:30px; font-weight:600; text-decoration:none; transition:0.3s; text-align:center; font-size:1rem; }
-        .btn-primary { background:#b83b14; color:white; border:none; }
-        .btn-primary:hover { background:#e04f20; transform:scale(1.03); }
+        .btn { display:inline-block; padding:0.8rem 1.8rem; border-radius:30px; font-weight:600; text-decoration:none; transition:0.3s; text-align:center; margin-top:auto; }
+        .btn-primary { background:#4a2312; color:white; }
+        .btn-primary:hover { background:#6e371c; }
         
-        /* DIRECT ENQUIRY BANNER */
-        .enquiry-banner { background:linear-gradient(135deg, #611c05, #942f10); color:white; margin:2rem 8% 5rem 8%; padding:3.5rem; border-radius:30px; text-align:center; box-shadow:0 10px 30px rgba(97,28,5,0.2); }
-        .enquiry-banner h2 { font-family:'Playfair Display', serif; font-size:2.5rem; color:#fcdfa9; margin-bottom:1rem; }
-        .enquiry-banner p { max-width:650px; margin:0 auto 2.5rem auto; font-size:1.1rem; opacity:0.9; line-height:1.7; }
-        .action-buttons { display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; }
-        .btn-whatsapp { background:#25D366; color:white; }
-        .btn-whatsapp:hover { background:#1ebd57; transform:translateY(-3px); }
-        .btn-instagram { background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color:white; }
-        .btn-instagram:hover { transform:translateY(-3px); opacity:0.95; }
+        footer { background:#300c01; color:#fcdfa9; text-align:center; padding:2rem; font-size:0.95rem; }
 
-        footer { background:#300c01; color:#fcdfa9; text-align:center; padding:2rem; font-size:0.95rem; border-top:3px solid #b83b14; }
+        @media (max-width: 768px) {
+            body { padding-top: 140px; }
+            .navbar { padding: 1rem; flex-direction: column; gap: 0.8rem; }
+            .logo { font-size: 1.6rem; }
+            .nav-links { width: 100%; justify-content: center; flex-wrap: wrap; gap: 0.4rem; }
+            .nav-links a { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+            .hero { height: 40vh; }
+            .hero h1 { font-size: 2.2rem; }
+            .hero p { font-size: 1rem; }
+            .section-title { font-size: 1.8rem; margin: 2rem 0 1rem 0; }
+            .main-container { padding: 0 4% 3rem 4%; gap: 1.5rem; }
+        }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="index.html" class="logo">Shahi Hennaholic</a>
+        <a href="index.html" class="logo">shahihennaholic</a>
         <div class="nav-links">
             <a href="index.html" class="active">Home</a>
+            <a href="cones.html">Cones & Storage</a>
             <a href="styles.html">Mehndi Styles</a>
-            <a href="storage.html">Cone & Storage</a>
-            <a href="reviews.html">Reviews</a>
+            <a href="reviews.html">Reviews & Contact</a>
         </div>
     </nav>
 
     <section class="hero">
         <h1>Shahi Henna Artistry</h1>
-        <p>Pure, 100% natural organic mehndi handcrafted for your most precious traditional celebrations, bridal milestones, and festive events.</p>
+        <p>Organic Fresh Cones | Traditional Mehndi at Your Doorstep</p>
     </section>
 
+    <h2 class="section-title">Our Collections</h2>
+
     <main class="main-container">
-        
         <div class="category-card">
-            <img src="images/arabic.jfif" alt="Mehndi Styles" class="card-img">
+            <img src="images/Bridal Mehandi designs.jpeg" alt="Bridal Mehndi" class="card-img">
             <div class="card-content">
-                <h2>Our Design Catalog</h2>
-                <p>Explore gorgeous traditional paths, intricate full-hand bridal arrangements, elegant geometric layouts, and modern flow patterns.</p>
+                <h2>Bridal Mehndi</h2>
                 <a href="styles.html" class="btn btn-primary">View Designs</a>
             </div>
         </div>
 
         <div class="category-card">
-            <img src="images/organic.jfif" alt="Cone Storage" class="card-img">
+            <img src="images/Normal cones and bridal cones.jpeg" alt="Organic Cones" class="card-img">
             <div class="card-content">
-                <h2>Cone Care & Storage</h2>
-                <p>Maximize your application stain and retain ultimate freshness with our detailed temperature, freeze, and handling layout guides.</p>
-                <a href="storage.html" class="btn btn-primary">Read Care Instructions</a>
+                <h2>Organic Cones</h2>
+                <a href="cones.html" class="btn btn-primary">Storage Instructions</a>
             </div>
         </div>
 
         <div class="category-card">
-            <img src="images/henna.jpg" alt="Client Reviews" class="card-img">
+            <img src="images/Mandala design front and back.jpeg" alt="Mandala Work" class="card-img">
             <div class="card-content">
-                <h2>Customer Experience</h2>
-                <p>Browse glowing testimonials from real clients, inspect dark stain outcomes, or leave feedback about your own custom orders.</p>
-                <a href="reviews.html" class="btn btn-primary">Read & Write Reviews</a>
+                <h2>Mandala Masterpieces</h2>
+                <a href="styles.html" class="btn btn-primary">Explore Style</a>
             </div>
         </div>
 
+        <div class="category-card">
+            <img src="images/Palm length design front and back.jpeg" alt="Palm Style" class="card-img">
+            <div class="card-content">
+                <h2>Palm Length Art</h2>
+                <a href="styles.html" class="btn btn-primary">See Collection</a>
+            </div>
+        </div>
     </main>
 
-    <section class="enquiry-banner">
-        <h2>Custom Bookings & Product Enquiries</h2>
-        <p>Everything listed is fully available to order! Want custom bridal layouts, festival bookings, or fresh premium organic cone batches? Tap directly to instantly connect with us.</p>
-        <div class="action-buttons">
-            <a href="https://wa.me/917010850154?text=Hi%20Shahi%20Hennaholic,%20I%20am%20interested%20in%20booking%20an%20appointment%20or%20ordering%20cones!" target="_blank" class="btn btn-whatsapp">Inquire on WhatsApp</a>
-            <a href="https://www.instagram.com/shihennaholic/" target="_blank" class="btn btn-instagram">Message on Instagram</a>
-        </div>
-    </section>
-
-    <footer>Shahi Hennaholic • Premium Organic Mehndi Artistry • Call / WhatsApp: +91 7010850154</footer>
+    <footer>shahihennaholic • Premium Organic Mehndi Artistry</footer>
 
 </body>
 </html>
