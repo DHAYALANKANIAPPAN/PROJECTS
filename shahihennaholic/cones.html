@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cones & Storage | Shahi Henna</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Poppins', sans-serif; background:#fffaf5; color:#3d2314; padding-top:140px; }
+        
+        .navbar { position:fixed; top:0; width:100%; z-index:1000; background:#4a2312; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 4rem; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+        .logo { color:#fcdfa9; font-family:'Playfair Display', serif; font-size:2rem; font-weight:700; text-decoration:none; }
+        .nav-links { display:flex; gap:1.5rem; }
+        .nav-links a { text-decoration:none; color:#fff; font-weight:500; padding:0.6rem 1.2rem; border-radius:20px; transition:0.3s; font-size:0.95rem; }
+        .nav-links a:hover, .nav-links a.active { background:#fffaf5; color:#4a2312; }
+
+        .container { max-width:1100px; margin:0 auto; padding:0 2rem; }
+        .page-title { text-align:center; font-family:'Playfair Display', serif; font-size:2.8rem; color:#4a2312; margin-bottom:3rem; }
+        
+        .cone-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:2.5rem; margin-bottom:4rem; }
+        .cone-card { background:white; border-radius:20px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.04); text-align:center; border:1px solid #f2e4d9; }
+        .cone-card img { width:100%; height:320px; object-fit:cover; }
+        .cone-card h3 { padding:1.5rem; color:#4a2312; font-family:'Playfair Display', serif; font-size:1.3rem; }
+
+        .care-list { list-style:none; }
+        .care-list li { padding:0.8rem 0; border-bottom:1px solid #fcf2e8; font-size:0.95rem; color:#4a3931; display:flex; align-items:center; }
+        .care-list li:last-child { border-bottom:none; }
+        .dot { width:8px; height:8px; background:#b83b14; border-radius:50%; margin-right:1rem; flex-shrink:0; }
+
+        .care-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:2.5rem; margin-bottom:4rem; }
+        .care-box { background:white; border-radius:20px; padding:2.5rem; box-shadow:0 8px 25px rgba(0,0,0,0.04); border-top:6px solid #4a2312; }
+        .care-box h2 { font-family:'Playfair Display', serif; color:#4a2312; margin-bottom:1.5rem; text-align:center; }
+        
+        .storage-box { background:white; border-radius:20px; padding:3rem; box-shadow:0 8px 25px rgba(0,0,0,0.04); border-top:6px solid #b83b14; margin-bottom:4rem; }
+        .storage-box h2 { font-family:'Playfair Display', serif; color:#4a2312; margin-bottom:1.5rem; text-align:center; }
+
+        footer { background:#300c01; color:#fcdfa9; text-align:center; padding:2rem; margin-top:4rem; }
+
+        @media (max-width: 768px) {
+            body { padding-top: 160px; }
+            .navbar { padding: 1rem; flex-direction: column; gap: 0.8rem; }
+            .logo { font-size: 1.6rem; }
+            .nav-links { width: 100%; justify-content: center; flex-wrap: wrap; gap: 0.4rem; }
+            .nav-links a { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+            .page-title { font-size: 2rem; margin-bottom: 2rem; }
+            .cone-grid, .care-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            .care-box, .storage-box { padding: 1.5rem; }
+            .container { padding: 0 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="logo">shahihennaholic</a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="cones.html" class="active">Cones & Storage</a>
+            <a href="styles.html">Mehndi Styles</a>
+            <a href="reviews.html">Reviews & Contact</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Cone Varieties & Care Instructions</h1>
+        
+        <div class="cone-grid">
+            <div class="cone-card">
+                <img src="images/Nail cones .jpeg" alt="Nail Cones">
+                <h3>Nail Cones</h3>
+            </div>
+            <div class="cone-card">
+                <img src="images/Normal cones and bridal cones.jpeg" alt="Bridal Cones">
+                <h3>Normal & Bridal Cones</h3>
+            </div>
+        </div>
+
+        <div class="storage-box">
+            <h2>Cone Storage Instructions</h2>
+            <ul class="care-list">
+                <li><span class="dot"></span>Store cones in the freezer immediately after receiving your order.</li>
+                <li><span class="dot"></span>Cones remain fresh and fully potent for up to 2-3 months when kept frozen.</li>
+                <li><span class="dot"></span>Keep outside at room temperature for 20-30 minutes before starting application.</li>
+                <li><span class="dot"></span>Do not refreeze a cone once it has been fully thawed.</li>
+                <li><span class="dot"></span>Proper freezer storage ensures a vibrant, rich color output.</li>
+            </ul>
+        </div>
+
+        <div class="care-grid">
+            <div class="care-box">
+                <h2>Before Care (Before Applying)</h2>
+                <ul class="care-list">
+                    <li><span class="dot"></span>Ensure skin area is completely clean & dry.</li>
+                    <li><span class="dot"></span>Avoid applying any oil, lotion, cream, or soap residue.</li>
+                    <li><span class="dot"></span>Do not wax or bleach the area within 2 days of application.</li>
+                    <li><span class="dot"></span>Good natural body heat helps the stain develop beautifully.</li>
+                    <li><span class="dot"></span>Leaving henna on overnight yields the deepest possible colors.</li>
+                </ul>
+            </div>
+
+            <div class="care-box">
+                <h2>After Care (After Removal)</h2>
+                <ul class="care-list">
+                    <li><span class="dot"></span>Keep the henna design on for a minimum of 6–8 hours.</li>
+                    <li><span class="dot"></span>Scrape paste away gently; do not use water for removal.</li>
+                    <li><span class="dot"></span>Soak with coconut or clove oil to loosen dry crust flakes.</li>
+                    <li><span class="dot"></span>Avoid water, liquid soaps, or sanitizers for at least 12 hours.</li>
+                    <li><span class="dot"></span>The henna stain darkens naturally over the next 24–48 hours.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer>shahihennaholic • Premium Organic Mehndi Artistry</footer>
+</body>
+</html>
