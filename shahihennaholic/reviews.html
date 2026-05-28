@@ -3,127 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Reviews | Shahi Hennaholic</title>
+    <title>Reviews & Contact | Shahi Henna</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Poppins', sans-serif; background:#fffaf5; color:#3d2314; padding-top:120px; }
-        .navbar { position:fixed; top:0; width:100%; z-index:1000; background:#611c05; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 4rem; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
-        .logo { color:#fcdfa9; font-family:'Playfair Display', serif; font-size:2.2rem; font-weight:700; text-decoration:none; }
-        .nav-links { display:flex; gap:2.5rem; }
-        .nav-links a { text-decoration:none; color:#fff; font-weight:500; transition:0.3s; }
-        .nav-links a:hover, .nav-links a.active { color:#fcdfa9; }
+        body { font-family:'Poppins', sans-serif; background:#fffaf5; color:#3d2314; padding-top:140px; }
+        
+        .navbar { position:fixed; top:0; width:100%; z-index:1000; background:#4a2312; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 4rem; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+        .logo { color:#fcdfa9; font-family:'Playfair Display', serif; font-size:2rem; font-weight:700; text-decoration:none; }
+        .nav-links { display:flex; gap:1.5rem; }
+        .nav-links a { text-decoration:none; color:#fff; font-weight:500; padding:0.6rem 1.2rem; border-radius:20px; transition:0.3s; font-size:0.95rem; }
+        .nav-links a:hover, .nav-links a.active { background:#fffaf5; color:#4a2312; }
 
-        .review-container { max-width:900px; margin:0 auto 5rem auto; padding:0 2rem; }
-        .header-box { text-align:center; margin-bottom:3rem; }
-        .header-box h1 { font-family:'Playfair Display', serif; font-size:3rem; color:#611c05; }
+        .layout-container { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; max-width: 1200px; margin: 0 auto; padding: 0 2rem 5rem 2rem; }
+        .section-box { background: white; border-radius: 20px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f2e4d9; }
+        .section-box h2 { font-family: 'Playfair Display', serif; color: #4a2312; margin-bottom: 1.5rem; font-size: 2rem; border-bottom: 2px solid #f5eae1; padding-bottom: 0.5rem; }
+        
+        .contact-info { margin-bottom: 1.5rem; font-size: 1.05rem; }
+        .contact-info strong { color: #b83b14; }
+        .instagram-btn { display: inline-block; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; padding: 0.8rem 2rem; border-radius: 30px; text-decoration: none; font-weight: 600; margin-top: 1rem; transition: 0.3s; text-align: center; }
+        .instagram-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(220,39,67,0.3); }
 
-        /* REVIEWS DISPLAY */
-        .reviews-list { display:flex; flex-direction:column; gap:1.5rem; margin-bottom:4rem; }
-        .review-card { background:white; padding:2rem; border-radius:15px; box-shadow:0 8px 20px rgba(97,28,5,0.04); border:1px solid #f2e4d9; }
-        .reviewer-info { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem; }
-        .reviewer-name { font-weight:600; color:#611c05; font-size:1.1rem; }
-        .stars { color:#ffbc0b; font-size:1.2rem; }
-        .review-text { color:#5c483f; line-height:1.6; }
+        /* Custom Simple Review Style */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #4a2312; font-size: 0.9rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #e1d4ca; border-radius: 8px; font-family: inherit; }
+        .submit-review-btn { background: #4a2312; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; width: 100%; }
+        .submit-review-btn:hover { background: #6e371c; }
 
-        /* ADD REVIEW FORM */
-        .form-card { background:#fff0e6; border-radius:20px; padding:3rem; border:1px dashed #b83b14; }
-        .form-card h2 { font-family:'Playfair Display', serif; font-size:1.8rem; color:#611c05; margin-bottom:1.5rem; text-align:center; }
-        .form-group { margin-bottom:1.5rem; display:flex; flex-direction:column; gap:0.5rem; }
-        .form-group label { font-weight:500; color:#4a3328; }
-        .form-group input, .form-group textarea, .form-group select { padding:0.9rem; border-radius:10px; border:1px solid #dec8b7; background:white; font-family:inherit; font-size:1rem; }
-        .form-group textarea { height:120px; resize:none; }
-        .btn-submit { background:#b83b14; color:white; border:none; padding:1rem; border-radius:10px; font-weight:600; font-size:1.1rem; cursor:pointer; transition:0.3s; }
-        .btn-submit:hover { background:#e04f20; }
+        .reviews-display-area { margin-top: 30px; max-height: 400px; overflow-y: auto; padding-right: 5px; }
+        .review-card { background: #fffdfb; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #4a2312; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .reviewer-name { font-weight: 700; color: #4a2312; }
+        .reviewer-email { font-size: 0.8rem; color: #8a766a; }
+        .owner-badge { background: #fcdfa9; color: #4a2312; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; margin-left: 8px; display: inline-block; }
+        .reply-box-btn { font-size: 0.8rem; color: #b83b14; background: none; border: none; cursor: pointer; font-weight: 600; margin-top: 5px; text-decoration: underline; }
+        .owner-reply-div { background: #fdf8f4; border-left: 3px solid #b83b14; padding: 10px; margin-top: 10px; border-radius: 6px; }
 
-        footer { background:#300c01; color:#fcdfa9; text-align:center; padding:2rem; margin-top:5rem; }
+        footer { background:#300c01; color:#fcdfa9; text-align:center; padding:2rem; }
+
+        @media (max-width: 768px) {
+            body { padding-top: 160px; }
+            .navbar { padding: 1rem; flex-direction: column; gap: 0.8rem; }
+            .logo { font-size: 1.6rem; }
+            .nav-links { width: 100%; justify-content: center; flex-wrap: wrap; gap: 0.4rem; }
+            .nav-links a { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+            .layout-container { grid-template-columns: 1fr; gap: 2rem; padding: 0 1rem 3rem 1rem; }
+            .section-box { padding: 1.5rem; }
+            .section-box h2 { font-size: 1.6rem; }
+            .instagram-btn { width: 100%; }
+        }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="index.html" class="logo">Shahi Hennaholic</a>
+        <a href="index.html" class="logo">shahihennaholic</a>
         <div class="nav-links">
             <a href="index.html">Home</a>
+            <a href="cones.html">Cones & Storage</a>
             <a href="styles.html">Mehndi Styles</a>
-            <a href="storage.html">Cone & Storage</a>
-            <a href="reviews.html" class="active">Reviews</a>
+            <a href="reviews.html" class="active">Reviews & Contact</a>
         </div>
     </nav>
 
-    <div class="review-container">
-        <div class="header-box">
-            <h1>Client Testimonials</h1>
+    <div class="layout-container">
+        <div class="section-box">
+            <h2>Get In Touch</h2>
+            <p class="contact-info"><strong>🎨 Brand Name:</strong> Shahi Henna Artistry</p>
+            <p class="contact-info"><strong>📍 Bookings:</strong> Available for local event appointments & custom bridal set orders</p>
+            <p class="contact-info"><strong>🌿 Quality Guarantee:</strong> 100% Organic, fresh chemical-free handmade henna cones</p>
+            <p class="contact-info">To place an order, view specific pricing details, or check slot availability, contact us via Instagram below:</p>
+            <a href="https://www.instagram.com/shahihennaholic" target="_blank" class="instagram-btn">Follow @shahihennaholic</a>
         </div>
 
-        <div class="reviews-list" id="reviewsContainer">
-            <div class="review-card">
-                <div class="reviewer-info">
-                    <span class="reviewer-name">Ananya R.</span>
-                    <span class="stars">★★★★★</span>
-                </div>
-                <p class="review-text">The bridal mehndi stain turned out to be an incredibly deep, rich dark color. Everyone kept complimenting the neat patterns. Highly recommended!</p>
-            </div>
-            <div class="review-card">
-                <div class="reviewer-info">
-                    <span class="reviewer-name">Meera Kapoor</span>
-                    <span class="stars">★★★★★</span>
-                </div>
-                <p class="review-text">Extremely fresh organic cones! The flow was very smooth, and it didn't cause any skin irritation. Will buy my future batches here exclusively.</p>
-            </div>
-        </div>
-
-        <div class="form-card">
-            <h2>Share Your Experience</h2>
-            <form id="reviewForm">
+        <div class="section-box">
+            <h2>Customer Reviews</h2>
+            
+            <form id="simpleReviewForm">
                 <div class="form-group">
-                    <label for="name">Your Name</label>
-                    <input type="text" id="name" required placeholder="Enter your full name">
+                    <label>Name</label>
+                    <input type="text" id="revName" required placeholder="Enter your name">
                 </div>
                 <div class="form-group">
-                    <label for="rating">Rating Selection</label>
-                    <select id="rating">
-                        <option value="★★★★★">5 Stars ★★★★★</option>
-                        <option value="★★★★">4 Stars ★★★★</option>
-                        <option value="★★★">3 Stars ★★★</option>
-                    </select>
+                    <label>Email Address</label>
+                    <input type="email" id="revEmail" required placeholder="name@example.com">
                 </div>
                 <div class="form-group">
-                    <label for="comments">Your Feedback</label>
-                    <textarea id="comments" required placeholder="Write your review here..."></textarea>
+                    <label>Review Comment</label>
+                    <textarea id="revComment" rows="3" required placeholder="Write your review here..."></textarea>
                 </div>
-                <button type="submit" class="btn-submit">Publish Review</button>
+                <button type="submit" class="submit-review-btn">Post Review</button>
             </form>
+
+            <div class="reviews-display-area" id="reviewsContainer">
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="reviewer-name">Srinithi</span>
+                        <span class="reviewer-email">srinithi@example.com</span>
+                    </div>
+                    <p>The organic cones give such a dark, beautiful stain! Highly recommended.</p>
+                    <div class="owner-reply-div">
+                        <strong>shahihennaholic <span class="owner-badge">Owner</span></strong>
+                        <p>Thank you so much for your sweet words! ❤️</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script>
-        document.getElementById('reviewForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const rating = document.getElementById('rating').value;
-            const comments = document.getElementById('comments').value;
+    <footer>shahihennaholic • Premium Organic Mehndi Artistry</footer>
 
-            // Generate card element
-            const newCard = document.createElement('div');
-            newCard.className = 'review-card';
-            newCard.innerHTML = `
-                <div class="reviewer-info">
-                    <span class="reviewer-name">${name}</span>
-                    <span class="stars">${rating}</span>
+    <script>
+        const reviewForm = document.getElementById('simpleReviewForm');
+        const container = document.getElementById('reviewsContainer');
+
+        // Load existing reviews from browser storage memory
+        let savedReviews = JSON.parse(localStorage.getItem('henna_reviews')) || [];
+
+        function renderReviews() {
+            // Keep default initial placeholder visible
+            let initialHTML = `
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="reviewer-name">Srinithi</span>
+                        <span class="reviewer-email">srinithi@example.com</span>
+                    </div>
+                    <p>The organic cones give such a dark, beautiful stain! Highly recommended.</p>
+                    <div class="owner-reply-div">
+                        <strong>shahihennaholic <span class="owner-badge">Owner</span></strong>
+                        <p>Thank you so much for your sweet words! ❤️</p>
+                    </div>
                 </div>
-                <p class="review-text">${comments}</p>
             `;
 
-            // Append onto structural display wrapper
-            document.getElementById('reviewsContainer').appendChild(newCard);
+            savedReviews.forEach((rev, index) => {
+                let replyHTML = '';
+                if(rev.reply) {
+                    replyHTML = `
+                        <div class="owner-reply-div">
+                            <strong>shahihennaholic <span class="owner-badge">Owner</span></strong>
+                            <p>${rev.reply}</p>
+                        </div>
+                    `;
+                } else {
+                    replyHTML = `<button class="reply-box-btn" onclick="replyAsOwner(${index})">Reply as Owner</button>`;
+                }
 
-            // Wipe input values
-            document.getElementById('reviewForm').reset();
+                initialHTML += `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="reviewer-name">${rev.name}</span>
+                            <span class="reviewer-email">${rev.email}</span>
+                        </div>
+                        <p>${rev.comment}</p>
+                        ${replyHTML}
+                    </div>
+                `;
+            });
+            container.innerHTML = initialHTML;
+        }
+
+        reviewForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('revName').value;
+            const email = document.getElementById('revEmail').value;
+            const comment = document.getElementById('revComment').value;
+
+            savedReviews.push({ name, email, comment, reply: null });
+            localStorage.setItem('henna_reviews', JSON.stringify(savedReviews));
+            
+            reviewForm.reset();
+            renderReviews();
         });
-    </script>
 
-    <footer>Shahi Hennaholic • Premium Organic Mehndi Artistry</footer>
+        // Secret Admin reply action
+        window.replyAsOwner = function(index) {
+            const secretCode = prompt("Enter Admin Security Code to post official reply:");
+            if(secretCode === "shahi123") {
+                const replyText = prompt("Type your official reply text:");
+                if(replyText) {
+                    savedReviews[index].reply = replyText;
+                    localStorage.setItem('henna_reviews', JSON.stringify(savedReviews));
+                    renderReviews();
+                }
+            } else if (secretCode !== null) {
+                alert("Incorrect security code access denied.");
+            }
+        }
+
+        renderReviews();
+    </script>
 </body>
 </html>
