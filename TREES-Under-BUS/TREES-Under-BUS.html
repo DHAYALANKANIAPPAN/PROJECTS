@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>TREES under BUS — pick the shady side</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root{
+    --ink:#171a23;
+    --paper:#eef1f2;
+    --paper-2:#e3e8ea;
+    --card:#ffffff;
+    --dusk:#1b2340;
+    --dusk-2:#262f52;
+    --sun:#f2a93b;
+    --sun-deep:#d98a1f;
+    --shade:#2e6e62;
+    --shade-deep:#204e46;
+    --ember:#e4572e;
+    --line:#d7dcde;
+    --ink-soft:#565d6b;
+    --radius:18px;
+    --shadow: 0 1px 2px rgba(23,26,35,.04), 0 8px 24px -8px rgba(23,26,35,.12);
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces',Georgia,serif;
+    font-optical-sizing:auto;
+    letter-spacing:-0.01em;
+  }
+  .mono{ font-family:'IBM Plex Mono',ui-monospace,monospace; }
+  a{color:inherit;}
+  button{ font-family:inherit; }
+
+  :focus-visible{ outline:2px solid var(--sun-deep); outline-offset:2px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 20px; }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    background:radial-gradient(120% 180% at 12% 0%, var(--dusk-2) 0%, var(--dusk) 55%, #12172c 100%);
+    color:#f4f1ea;
+    padding:38px 0 120px;
+    position:relative;
+    overflow:hidden;
+  }
+  .topbar::after{
+    content:"";
+    position:absolute; inset:auto 0 0 0; height:120px;
+    background:linear-gradient(to bottom, transparent, var(--paper));
+    pointer-events:none;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-mark{
+    width:38px; height:38px; border-radius:50%;
+    background:conic-gradient(from -90deg, var(--sun) 0deg 180deg, var(--shade) 180deg 360deg);
+    box-shadow: inset 0 0 0 2px rgba(244,241,234,.35);
+    flex:0 0 auto;
+  }
+  .brand-name{ font-size:1.35rem; font-weight:600; letter-spacing:-0.02em; }
+  .brand-tag{ color:#c7cadd; font-size:.85rem; margin-top:1px; }
+
+  .hero-copy{ margin-top:52px; max-width:640px; }
+  .hero-copy h1{ font-size:clamp(2.1rem, 4.4vw, 3.2rem); font-weight:600; line-height:1.05; margin:0 0 14px; color:#faf7f0; }
+  .hero-copy p{ color:#cfd2e3; font-size:1.05rem; max-width:520px; margin:0; }
+
+  /* ---------- input card ---------- */
+  .input-card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow: var(--shadow);
+    padding:26px;
+    margin-top:34px;
+    position:relative;
+    z-index:2;
+  }
+  .field-row{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+  .field-row.three{ grid-template-columns: 1fr 1fr auto; align-items:end; }
+  @media (max-width:720px){
+    .field-row, .field-row.three{ grid-template-columns:1fr; }
+  }
+  .field{ position:relative; }
+  .field label{
+    display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--ink-soft); font-weight:600; margin-bottom:6px;
+  }
+  .field input[type=text], .field input[type=datetime-local], .field select{
+    width:100%; padding:12px 14px; border-radius:11px; border:1.5px solid var(--line);
+    font-size:.98rem; background:#fbfbfa; color:var(--ink);
+  }
+  .field input:focus, .field select:focus{ border-color:var(--sun-deep); background:#fff; }
+  .swap-btn{
+    border:1.5px solid var(--line); background:#fff; border-radius:50%;
+    width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; position:absolute; right:-19px; top:32px; z-index:3; color:var(--ink-soft);
+  }
+  @media (max-width:720px){ .swap-btn{ display:none; } }
+
+  .field-actions{ display:flex; gap:16px; margin-top:7px; flex-wrap:wrap; }
+  .link-btn{
+    background:none; border:0; padding:0; font-size:.76rem; color:var(--shade-deep);
+    text-decoration:underline; text-underline-offset:2px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;
+  }
+  .link-btn:hover{ color:var(--ink); }
+  .link-btn[disabled]{ opacity:.5; cursor:progress; text-decoration:none; }
+
+  .autocomplete{
+    position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid var(--line);
+    border-radius:11px; margin-top:4px; box-shadow:var(--shadow); z-index:20; overflow:hidden;
+    max-height:240px; overflow-y:auto;
+  }
+  .autocomplete button{
+    display:block; width:100%; text-align:left; padding:10px 14px; border:0; background:none;
+    cursor:pointer; font-size:.88rem; border-bottom:1px solid #f0f0ee;
+  }
+  .autocomplete button:hover, .autocomplete button:focus{ background:var(--paper); }
+  .autocomplete .ac-status{ padding:10px 14px; font-size:.82rem; color:var(--ink-soft); }
+
+  .submit-row{ display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap; }
+  .btn-primary{
+    background:var(--ink); color:#fff; border:0; padding:13px 22px; border-radius:11px;
+    font-weight:600; font-size:.95rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .btn-primary:hover{ background:#000; transform:translateY(-1px); }
+  .btn-primary[disabled]{ opacity:.6; cursor:progress; transform:none; }
+  .btn-ghost{
+    background:none; border:1.5px solid var(--line); color:var(--ink); padding:11px 16px;
+    border-radius:11px; font-size:.88rem; cursor:pointer; font-weight:500;
+  }
+  .btn-ghost:hover{ border-color:var(--ink); }
+  .presets{ font-size:.82rem; color:var(--ink-soft); }
+  .presets button{ background:none; border:0; color:var(--shade-deep); text-decoration:underline; cursor:pointer; font-size:.82rem; padding:0; }
+
+  /* ---------- wizard steps ---------- */
+  .wizard-step{ animation:fadein .25s ease; }
+  @keyframes fadein{ from{ opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+  .step-dots{ display:flex; gap:6px; margin-bottom:18px; }
+  .step-dots .dot{ width:8px; height:8px; border-radius:50%; background:var(--paper-2); }
+  .step-dots .dot.active{ background:var(--ink); width:20px; border-radius:5px; transition:width .2s ease; }
+  .step-intro-copy{ margin-bottom:18px; }
+  .step-intro-title{ font-family:'Fraunces',serif; font-size:1.3rem; font-weight:600; margin-bottom:4px; }
+  .step-intro-copy p{ color:var(--ink-soft); font-size:.92rem; margin:0; }
+  .step-nav{ display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:10px; }
+  #step-0{ padding:6px 0 4px; }
+
+  .time-quick{ display:flex; gap:6px; margin-top:7px; flex-wrap:wrap; }
+  .time-quick button{
+    border:1.5px solid var(--line); background:#fff; border-radius:8px; padding:4px 9px;
+    font-size:.74rem; color:var(--ink-soft); cursor:pointer;
+  }
+  .time-quick button:hover{ border-color:var(--sun-deep); color:var(--ink); }
+  .tz-note{ font-size:.72rem; color:var(--ink-soft); margin-top:5px; }
+
+  .error-banner{
+    margin-top:14px; background:#fff4ee; border:1px solid #f2c8b3; color:#8a3d1f;
+    padding:12px 14px; border-radius:11px; font-size:.88rem; display:none;
+  }
+  .error-banner.show{ display:block; }
+
+  /* ---------- location picker modal (full-screen) ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:#fff; display:none;
+    z-index:200; padding:0;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background:#fff; width:100%; height:100%; max-width:none; max-height:none;
+    padding:0; box-shadow:none; display:flex; flex-direction:column; overflow:hidden;
+  }
+  .modal-head{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:14px;
+    padding:16px 18px 0; flex:0 0 auto;
+  }
+  .modal-head h3{ margin:0 0 4px; font-size:1.1rem; }
+  .modal-head p{ margin:0; color:var(--ink-soft); font-size:.82rem; }
+  .modal-close{ background:none; border:0; font-size:1.4rem; line-height:1; cursor:pointer; color:var(--ink-soft); padding:2px 6px; }
+  .modal-close:hover{ color:var(--ink); }
+  .modal-search-row{ position:relative; padding:12px 18px 0; flex:0 0 auto; }
+  .modal-search-row input{
+    width:100%; padding:11px 13px; border-radius:11px; border:1.5px solid var(--line); font-size:.95rem; background:#fbfbfa;
+  }
+  .modal-search-row input:focus{ border-color:var(--sun-deep); background:#fff; }
+  #picker-map{ flex:1 1 auto; min-height:220px; border-radius:0; border:0; margin:12px 0 0; }
+  .modal-hint{ font-size:.78rem; color:var(--ink-soft); margin:0; padding:8px 18px 0; flex:0 0 auto; }
+  .modal-selected{
+    margin:0; padding:10px 18px; background:var(--paper);
+    font-size:.85rem; min-height:20px; display:flex; align-items:center; gap:8px; flex:0 0 auto;
+  }
+  .modal-selected .dot{ width:8px; height:8px; border-radius:50%; background:var(--shade); flex:0 0 auto; }
+  .modal-actions{
+    display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+    padding:12px 18px; flex:0 0 auto; border-top:1px solid var(--line);
+  }
+  .modal-nearby-row{ padding:10px 18px 0; flex:0 0 auto; }
+  .nearby-list{ margin:10px 18px 0; border:1px solid var(--line); border-radius:11px; overflow:hidden; max-height:160px; overflow-y:auto; flex:0 0 auto; }
+  .nearby-list button{
+    display:block; width:100%; text-align:left; padding:9px 12px; border:0; background:#fff;
+    cursor:pointer; font-size:.84rem; border-bottom:1px solid #f0f0ee;
+  }
+  .nearby-list button:last-child{ border-bottom:0; }
+  .nearby-list button:hover{ background:var(--paper); }
+  .nearby-list .nl-status{ padding:10px 12px; font-size:.82rem; color:var(--ink-soft); }
+
+  /* ---------- main content ---------- */
+  main{ padding:34px 0 90px; }
+  .section-title{ font-size:1.35rem; font-weight:600; margin:0 0 4px; }
+  .section-sub{ color:var(--ink-soft); font-size:.9rem; margin:0 0 18px; }
+
+  .loading{ display:none; align-items:center; gap:14px; padding:30px 6px; color:var(--ink-soft); }
+  .loading.show{ display:flex; }
+  .sun-spin{
+    width:26px; height:26px; border-radius:50%;
+    background:conic-gradient(var(--sun) 0deg, var(--paper-2) 0deg);
+    animation:spin 1.1s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .route-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(270px,1fr)); gap:14px; }
+  .route-card{
+    background:var(--card); border-radius:16px; padding:18px; box-shadow:var(--shadow);
+    cursor:pointer; border:2px solid transparent; text-align:left;
+  }
+  .route-card:hover, .route-card:focus-visible{ border-color:var(--sun-deep); }
+  .route-card.active{ border-color:var(--ink); }
+  .route-card .rtitle{ font-weight:700; font-size:1rem; margin-bottom:2px; }
+  .route-card .rmeta{ color:var(--ink-soft); font-size:.82rem; margin-bottom:12px; }
+  .side-bar{ display:flex; height:8px; border-radius:6px; overflow:hidden; background:var(--paper-2); margin-bottom:10px; }
+  .side-bar span{ display:block; height:100%; }
+  .side-bar .r{ background:var(--sun); }
+  .side-bar .l{ background:var(--shade); }
+  .route-card .verdict{ font-size:.86rem; }
+  .verdict b{ font-weight:700; }
+  .pill{ display:inline-flex; align-items:center; gap:5px; font-size:.72rem; font-weight:600; padding:3px 9px; border-radius:99px; }
+  .pill.right{ background:#fdf1de; color:var(--sun-deep); }
+  .pill.left{ background:#e8f1ef; color:var(--shade-deep); }
+  .pill.none{ background:#eee; color:#777; }
+
+  /* ---------- detail panel ---------- */
+  .detail{ margin-top:36px; }
+  .detail-grid{ display:grid; grid-template-columns: 1.15fr .85fr; gap:22px; align-items:start; }
+  @media (max-width:900px){ .detail-grid{ grid-template-columns:1fr; } }
+
+  .panel{ background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px; }
+  .panel + .panel{ margin-top:20px; }
+
+  #map{ height:280px; border-radius:14px; overflow:hidden; }
+  .map-legend{ display:flex; gap:16px; margin-top:10px; font-size:.8rem; color:var(--ink-soft); flex-wrap:wrap; }
+  .map-legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .swatch{ width:11px; height:11px; border-radius:3px; display:inline-block; }
+
+  .verdict-banner{
+    border-radius:16px; padding:20px 22px; color:#fff; margin-bottom:20px;
+    background:linear-gradient(120deg, var(--dusk) 0%, var(--dusk-2) 100%);
+  }
+  .verdict-banner .vb-label{ font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; opacity:.7; margin-bottom:6px;}
+  .verdict-banner .vb-main{ font-family:'Fraunces',serif; font-size:1.5rem; font-weight:600; }
+  .verdict-banner .vb-sub{ font-size:.86rem; opacity:.85; margin-top:6px; }
+  .verdict-banner.none{ background:linear-gradient(120deg,#2b2f38,#1c1f26); }
+  .orientation-note{
+    background:#fdf1de; border:1px solid #f2d9a8; color:#6b4c14; padding:12px 16px;
+    border-radius:12px; font-size:.86rem; margin:-4px 0 20px; line-height:1.5;
+  }
+  .orientation-note strong{ color:#4a3308; }
+
+  /* timeline */
+  .timeline-wrap{ margin-top:6px; }
+  .timeline{ display:flex; height:34px; border-radius:8px; overflow:hidden; cursor:pointer; }
+  .timeline .run{ height:100%; position:relative; }
+  .timeline .run.right{ background:var(--sun); }
+  .timeline .run.left{ background:var(--shade); }
+  .timeline .run.none{ background:#d8dbdd; }
+  .timeline .run:hover::after{
+    content: attr(data-tip); position:absolute; bottom:120%; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; font-size:.72rem; padding:4px 8px; border-radius:6px; white-space:nowrap; z-index:5;
+  }
+  .timeline-scale{ display:flex; justify-content:space-between; font-size:.72rem; color:var(--ink-soft); margin-top:6px; }
+  .scrubber{ width:100%; margin-top:14px; accent-color:var(--ink); }
+  .runs-note{ font-size:.78rem; color:var(--ink-soft); margin-top:8px; }
+
+  /* compass dial */
+  .dial-row{ display:flex; gap:22px; align-items:center; flex-wrap:wrap; margin-top:16px; }
+  .dial{ position:relative; width:150px; height:150px; flex:0 0 auto; }
+  .dial svg{ width:100%; height:100%; }
+  .dial-readout{ font-size:.86rem; }
+  .dial-readout .dr-row{ display:flex; justify-content:space-between; gap:14px; padding:3px 0; border-bottom:1px dashed var(--line); min-width:190px; }
+  .dial-readout .dr-row:last-child{ border-bottom:0; }
+  .dial-readout .dr-key{ color:var(--ink-soft); }
+
+  /* seat diagram */
+  .seat-toggle{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .seat-toggle button{
+    flex:1; min-width:150px; padding:9px 12px; border-radius:10px; border:1.5px solid var(--line);
+    background:#fff; cursor:pointer; font-size:.82rem; font-weight:500;
+  }
+  .seat-toggle button.active{ border-color:var(--ink); background:var(--ink); color:#fff; }
+
+  .bus{ display:flex; gap:10px; justify-content:center; }
+  .bus-side{ flex:1; border-radius:14px; padding:14px 10px; text-align:center; }
+  .bus-side .bs-label{ font-size:.74rem; text-transform:uppercase; letter-spacing:.06em; font-weight:700; margin-bottom:8px; }
+  .bus-side .bs-time{ font-family:'Fraunces',serif; font-size:1.5rem; font-weight:600; }
+  .seat-row{ display:flex; gap:5px; justify-content:center; margin-top:10px; }
+  .seat{ width:16px; height:14px; border-radius:4px 4px 2px 2px; background:rgba(0,0,0,.12); }
+  .bus-aisle{ width:14px; }
+
+  .pref-row{ display:flex; align-items:center; gap:10px; margin-top:18px; font-size:.85rem; flex-wrap:wrap; }
+  .pref-row select{ padding:7px 10px; border-radius:9px; border:1.5px solid var(--line); font-size:.85rem; }
+
+  .share-row{ display:flex; gap:10px; margin-top:18px; align-items:center; flex-wrap:wrap; }
+  .copied-note{ font-size:.8rem; color:var(--shade-deep); display:none; }
+  .copied-note.show{ display:inline; }
+
+  footer{ padding:30px 0 60px; color:var(--ink-soft); font-size:.8rem; border-top:1px solid var(--line); margin-top:40px; }
+  footer .wrap{ display:flex; flex-direction:column; gap:6px; }
+
+  .empty-state{ text-align:center; padding:50px 20px; color:var(--ink-soft); }
+  .empty-state .em-mark{ font-size:2rem; margin-bottom:10px; }
+
+  .visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+  #app-watermark{
+    position:fixed; right:14px; bottom:12px; z-index:999999;
+    font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:.72rem; font-weight:600;
+    letter-spacing:.03em; color:rgba(23,26,35,.38); background:rgba(255,255,255,.55);
+    padding:4px 9px; border-radius:8px; pointer-events:none; user-select:none;
+    backdrop-filter:blur(2px);
+  }
+
+  #review-pill{
+    position:fixed; left:14px; bottom:12px; z-index:999998;
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--ink); color:#fff; font-size:.78rem; font-weight:600;
+    padding:9px 14px; border-radius:99px; text-decoration:none;
+    box-shadow:var(--shadow); transition:transform .15s ease, background .15s ease;
+  }
+  #review-pill:hover{ background:#000; transform:translateY(-1px); }
+  @media (max-width:640px){
+    #review-pill{ padding:8px 12px; font-size:.74rem; }
+  }
+</style>
+</head>
+<body>
+<div id="app-watermark" aria-hidden="true">@dhayalan</div>
+<a id="review-pill" href="https://forms.gle/j6BNYvzL1RaCbJSUA" target="_blank" rel="noopener noreferrer">📝 Post a review</a>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <div>
+        <div class="brand-name">TREES under BUS</div>
+        <div class="brand-tag">seat-side sun forecasting</div>
+      </div>
+    </div>
+    <div class="hero-copy">
+      <h1>Sit on the side the sun won't find.</h1>
+      <p>Tell us where you're headed and when. TREES under BUS traces the actual road, tracks the sun across your whole trip, and tells you — left or right — before you pick a seat.</p>
+    </div>
+
+    <div class="input-card">
+      <div class="step-dots" id="step-dots" hidden>
+        <span class="dot active" data-dot="0"></span>
+        <span class="dot" data-dot="1"></span>
+        <span class="dot" data-dot="2"></span>
+      </div>
+
+      <!-- STEP 0: intro -->
+      <div class="wizard-step" id="step-0">
+        <div class="step-intro-copy">
+          <div class="step-intro-title">Plan your trip</div>
+          <p>Two quick steps: where you're going, then when you're leaving.</p>
+        </div>
+        <button type="button" class="btn-primary" id="start-btn">Plan a trip →</button>
+      </div>
+
+      <form id="trip-form">
+        <!-- STEP 1: places -->
+        <div class="wizard-step" id="step-1" hidden>
+          <div class="field-row">
+            <div class="field">
+              <label for="from-input">From</label>
+              <input type="text" id="from-input" placeholder="City, station, or address" autocomplete="off" required />
+              <div class="autocomplete" id="from-suggest" hidden></div>
+              <div class="field-actions">
+                <button type="button" class="link-btn" data-open-picker="from">📍 Pick on map</button>
+                <button type="button" class="link-btn" id="use-location-btn">◎ Use my location</button>
+              </div>
+            </div>
+            <div class="field" style="position:relative;">
+              <button type="button" class="swap-btn" id="swap-btn" title="Swap origin and destination" aria-label="Swap origin and destination">⇄</button>
+              <label for="to-input">To</label>
+              <input type="text" id="to-input" placeholder="City, station, or address" autocomplete="off" required />
+              <div class="autocomplete" id="to-suggest" hidden></div>
+              <div class="field-actions">
+                <button type="button" class="link-btn" data-open-picker="to">📍 Pick on map</button>
+              </div>
+            </div>
+          </div>
+          <div class="step-nav">
+            <button type="button" class="btn-ghost" data-back="0">← Back</button>
+            <button type="button" class="btn-primary" id="to-step-2-btn">Continue →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: time, mode, submit -->
+        <div class="wizard-step" id="step-2" hidden>
+          <div class="field-row three">
+            <div class="field">
+              <label for="date-input">Departure date &amp; time</label>
+              <div style="display:flex; gap:8px;">
+                <input type="date" id="date-input" required style="flex:1.2;" />
+                <input type="time" id="time-input" required style="flex:1;" />
+              </div>
+              <div class="time-quick">
+                <button type="button" data-time="now">Now</button>
+                <button type="button" data-time="+1h">In 1 hour</button>
+                <button type="button" data-time="+3h">In 3 hours</button>
+                <button type="button" data-time="tomorrow-morning">Tomorrow 8am</button>
+              </div>
+              <div class="tz-note">Uses your device's current time zone.</div>
+            </div>
+            <div class="field">
+              <label for="mode-input">Mode</label>
+              <select id="mode-input">
+                <option value="bus">Bus</option>
+                <option value="car">Car</option>
+                <option value="train">Train (road proxy)</option>
+              </select>
+            </div>
+          </div>
+          <div class="step-nav">
+            <button type="button" class="btn-ghost" data-back="1">← Back</button>
+            <button type="submit" class="btn-primary" id="submit-btn">Find my shade →</button>
+          </div>
+        </div>
+
+        <div class="error-banner" id="error-banner"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+
+    <div class="loading" id="loading">
+      <div class="sun-spin" aria-hidden="true"></div>
+      <span id="loading-text">Tracing routes and tracking the sun…</span>
+    </div>
+
+    <div id="results-section" hidden>
+      <h2 class="section-title">Route options</h2>
+      <p class="section-sub" id="route-sub">Pick a route to see the full sun breakdown.</p>
+
+      <div class="route-grid" id="route-grid"></div>
+    </div>
+
+    <div class="detail" id="detail-section" hidden>
+      <div class="verdict-banner" id="verdict-banner">
+        <div class="vb-label">Recommendation</div>
+        <div class="vb-main" id="vb-main">—</div>
+        <div class="vb-sub" id="vb-sub">—</div>
+      </div>
+
+      <p class="orientation-note"><strong>Left and right mean: sit facing the front of the bus, the way it's driving.</strong> Left is the side on your left hand when you face forward toward the driver; right is on your right. If your seat faces backward, the sides are swapped.</p>
+
+      <div class="detail-grid">
+        <div>
+          <div class="panel">
+            <h3 class="section-title" style="font-size:1.05rem;">Route map</h3>
+            <div id="map"></div>
+            <div class="map-legend">
+              <span><span class="swatch" style="background:var(--sun)"></span> right side sunlit</span>
+              <span><span class="swatch" style="background:var(--shade)"></span> left side sunlit</span>
+              <span><span class="swatch" style="background:#d8dbdd"></span> no direct sun</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <h3 class="section-title" style="font-size:1.05rem;">Seat picker</h3>
+            <div class="seat-toggle" role="group" aria-label="Which side has 2 seats">
+              <button type="button" id="layout-unknown" class="active">Left / right only</button>
+              <button type="button" id="layout-left2">2-seater on left</button>
+              <button type="button" id="layout-right2">2-seater on right</button>
+            </div>
+            <div class="bus">
+              <div class="bus-side" id="side-left">
+                <div class="bs-label" id="label-left">Left</div>
+                <div class="bs-time mono" id="time-left">0m</div>
+                <div class="seat-row" id="seats-left"></div>
+              </div>
+              <div class="bus-side" id="side-right">
+                <div class="bs-label" id="label-right">Right</div>
+                <div class="bs-time mono" id="time-right">0m</div>
+                <div class="seat-row" id="seats-right"></div>
+              </div>
+            </div>
+
+            <div class="pref-row">
+              <label for="pref-select">Sun tolerance</label>
+              <select id="pref-select">
+                <option value="hot">I run hot — flag any sun</option>
+                <option value="normal" selected>Normal</option>
+                <option value="mild">I don't mind a little sun</option>
+              </select>
+            </div>
+
+            <div class="share-row">
+              <button type="button" class="btn-ghost" id="copy-link">Copy shareable link</button>
+              <span class="copied-note" id="copied-note">Link copied ✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><strong>How this works:</strong> real road geometry from an OSRM-compatible routing service, sun azimuth/elevation from a standard low-precision solar position formula, sampled along every road segment.</div>
+    <div>Assumptions: departure time is read in your device's current timezone, not the origin's local time. Timing across the route assumes a roughly even pace (no live traffic). Bus/train use road heading as a proxy for the physical route. This is a planning aid, not a guarantee — clouds, terrain, and buildings all block the sun too.</div>
+    <div style="margin-top:10px;"><a href="https://forms.gle/j6BNYvzL1RaCbJSUA" target="_blank" rel="noopener noreferrer" style="color:var(--shade-deep); font-weight:600; text-decoration:underline;">Leave a review →</a></div>
+  </div>
+</footer>
+
+<!-- ---------- Map-based location picker modal ---------- -->
+<div class="modal-overlay" id="picker-overlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <h3 id="picker-title">Pick a location</h3>
+        <p>Search, drop a pin, or tap the map — then confirm.</p>
+      </div>
+      <button type="button" class="modal-close" id="picker-close" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-search-row">
+      <input type="text" id="picker-search" placeholder="Search for a place…" autocomplete="off" />
+      <div class="autocomplete" id="picker-suggest" hidden></div>
+    </div>
+    <div id="picker-map"></div>
+    <p class="modal-hint">Tap or drag the pin to fine-tune the exact spot, or search nearby places below.</p>
+    <div class="modal-nearby-row">
+      <button type="button" class="btn-ghost" id="picker-find-busstands">🚌 Find bus stands nearby</button>
+    </div>
+    <div class="nearby-list" id="picker-nearby" hidden></div>
+    <div class="modal-selected" id="picker-selected"><span class="dot"></span><span id="picker-selected-text">No location chosen yet.</span></div>
+    <div class="modal-actions">
+      <button type="button" class="link-btn" id="picker-use-location">◎ Use my current location</button>
+      <button type="button" class="btn-primary" id="picker-confirm">Use this location</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- persistent watermark ----------------
+     Keeps the "@dhayalan" credit present on every step of the app; if it's
+     ever removed from the DOM, it's put back automatically. */
+  (function watermarkGuard(){
+    function ensureWatermark(){
+      if (!document.getElementById('app-watermark')){
+        const mark = document.createElement('div');
+        mark.id = 'app-watermark';
+        mark.setAttribute('aria-hidden', 'true');
+        mark.textContent = '@dhayalan';
+        document.body.appendChild(mark);
+      }
+      if (!document.getElementById('review-pill')){
+        const pill = document.createElement('a');
+        pill.id = 'review-pill';
+        pill.href = 'https://forms.gle/j6BNYvzL1RaCbJSUA';
+        pill.target = '_blank';
+        pill.rel = 'noopener noreferrer';
+        pill.textContent = '📝 Post a review';
+        document.body.appendChild(pill);
+      }
+    }
+    ensureWatermark();
+    const observer = new MutationObserver(ensureWatermark);
+    observer.observe(document.body, { childList: true });
+  })();
+
+  /* =========================================================
+     DATA MODEL (informal, documented for reference)
+     Route     { geometry:[[lon,lat],...], distance, duration, segments:[Segment], runs:[Run], aggregate:Aggregate }
+     Segment   { start,end,distance,durationSec,bearing,timestamp,sunAzimuth,sunElevation,relBearing,side,weight }
+     Run       { side, durationSec, startOffsetSec, coords:[[lat,lon],...] }
+     Aggregate { left, right, none, leftScore, rightScore, total }
+     ========================================================= */
+
+  /* ---------------- math helpers ---------------- */
+  const rad = d => d * Math.PI / 180;
+  const deg = r => r * 180 / Math.PI;
+  const norm360 = d => ((d % 360) + 360) % 360;
+  const norm180 = d => { const x = norm360(d); return x > 180 ? x - 360 : x; };
+
+  function haversine(lat1, lon1, lat2, lon2){
+    const R = 6371000;
+    const p1 = rad(lat1), p2 = rad(lat2);
+    const dp = rad(lat2 - lat1), dl = rad(lon2 - lon1);
+    const a = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  function initialBearing(lat1, lon1, lat2, lon2){
+    const p1 = rad(lat1), p2 = rad(lat2), dl = rad(lon2 - lon1);
+    const y = Math.sin(dl) * Math.cos(p2);
+    const x = Math.cos(p1)*Math.sin(p2) - Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
+    return norm360(deg(Math.atan2(y, x)));
+  }
+
+  // Low-precision solar position (Meeus / NOAA-style algorithm), good to well
+  // under a degree — plenty of precision for a "which side of the bus" question.
+  function sunPosition(date, lat, lon){
+    const JD = date.getTime() / 86400000 + 2440587.5;
+    const n = JD - 2451545.0;
+    const L = norm360(280.460 + 0.9856474 * n);
+    const g = norm360(357.528 + 0.9856003 * n);
+    const lambda = L + 1.915 * Math.sin(rad(g)) + 0.020 * Math.sin(rad(2*g));
+    const epsilon = 23.439 - 0.0000004 * n;
+
+    const alpha = norm360(deg(Math.atan2(Math.cos(rad(epsilon)) * Math.sin(rad(lambda)), Math.cos(rad(lambda)))));
+    const deltaRad = Math.asin(Math.sin(rad(epsilon)) * Math.sin(rad(lambda)));
+
+    const gmst = norm360(280.46061837 + 360.98564736629 * n);
+    const lst = norm360(gmst + lon);
+    const H = norm180(lst - alpha);
+
+    const latRad = rad(lat);
+    const sinAlt = Math.sin(latRad)*Math.sin(deltaRad) + Math.cos(latRad)*Math.cos(deltaRad)*Math.cos(rad(H));
+    const altRad = Math.asin(Math.max(-1, Math.min(1, sinAlt)));
+    const elevation = deg(altRad);
+
+    const cosAz = (Math.sin(deltaRad) - Math.sin(latRad) * sinAlt) / (Math.cos(latRad) * Math.cos(altRad));
+    const sinAz = -Math.sin(rad(H)) * Math.cos(deltaRad) / Math.cos(altRad);
+    const azimuth = norm360(deg(Math.atan2(sinAz, cosAz)));
+
+    return { azimuth, elevation };
+  }
+
+  const TOLERANCE_WINDOWS = { hot: 30, normal: 40, mild: 55 };
+
+  function classifySide(relBearing, elevation, deadzone){
+    if (elevation <= 0) return { side: 'none', weight: 0 };
+    const abs = Math.abs(relBearing);
+    if (abs < deadzone || abs > (180 - deadzone)) return { side: 'none', weight: 0 };
+    const weight = Math.sin(rad(abs));
+    return { side: relBearing > 0 ? 'right' : 'left', weight };
+  }
+
+  function buildSegments(coordsLonLat, totalDurationSec, departureDate, deadzone){
+    const dists = [];
+    for (let i = 0; i < coordsLonLat.length - 1; i++){
+      dists.push(haversine(coordsLonLat[i][1], coordsLonLat[i][0], coordsLonLat[i+1][1], coordsLonLat[i+1][0]));
+    }
+    const totalDist = dists.reduce((a,b)=>a+b,0) || 1;
+    let cum = 0;
+    const segments = [];
+    for (let i = 0; i < coordsLonLat.length - 1; i++){
+      const [lon1, lat1] = coordsLonLat[i];
+      const [lon2, lat2] = coordsLonLat[i+1];
+      const d = dists[i];
+      const bearing = initialBearing(lat1, lon1, lat2, lon2);
+      const durSec = totalDurationSec * (d / totalDist);
+      const midOffsetSec = (cum + d/2) / totalDist * totalDurationSec;
+      const timestamp = new Date(departureDate.getTime() + midOffsetSec * 1000);
+      const midLat = (lat1 + lat2) / 2, midLon = (lon1 + lon2) / 2;
+      const sun = sunPosition(timestamp, midLat, midLon);
+      const relBearing = norm180(sun.azimuth - bearing);
+      const cls = classifySide(relBearing, sun.elevation, deadzone);
+      segments.push({
+        start: [lat1, lon1], end: [lat2, lon2], distance: d, durationSec: durSec,
+        bearing, timestamp, sunAzimuth: sun.azimuth, sunElevation: sun.elevation,
+        relBearing, side: cls.side, weight: cls.weight
+      });
+      cum += d;
+    }
+    return segments;
+  }
+
+  function aggregate(segments){
+    const agg = { left: 0, right: 0, none: 0, leftScore: 0, rightScore: 0, total: 0 };
+    segments.forEach(s => {
+      agg.total += s.durationSec;
+      if (s.side === 'left'){ agg.left += s.durationSec; agg.leftScore += s.durationSec * s.weight; }
+      else if (s.side === 'right'){ agg.right += s.durationSec; agg.rightScore += s.durationSec * s.weight; }
+      else agg.none += s.durationSec;
+    });
+    return agg;
+  }
+
+  function mergeRuns(segments){
+    const runs = [];
+    let offset = 0;
+    segments.forEach(s => {
+      const last = runs[runs.length - 1];
+      if (last && last.side === s.side){
+        last.durationSec += s.durationSec;
+        last.coords.push(s.end);
+      } else {
+        runs.push({ side: s.side, durationSec: s.durationSec, startOffsetSec: offset, coords: [s.start, s.end] });
+      }
+      offset += s.durationSec;
+    });
+    return runs;
+  }
+
+  /* ---------------- lightweight self-check (console only) ----------------
+     Some embedded/preview environments don't implement console.assert, which
+     would otherwise throw and mask the real self-test result. Fall back to a
+     tiny local assert that just warns, so this never breaks page load. */
+  function safeAssert(condition, message, value){
+    if (condition) return;
+    console.warn('[TREES under BUS self-test]', message, value);
+  }
+
+  function runSelfTests(){
+    try{
+      // Use a mid-latitude point (lat 40) rather than the equator: at the equator on an
+      // equinox the sun sits almost exactly at zenith at solar noon, where azimuth is
+      // mathematically ill-defined (divide-by-near-zero) — a degenerate case, not a
+      // meaningful test of the side-classification logic.
+
+      const noon = new Date(Date.UTC(2024, 2, 20, 12, 0, 0));
+      const sunNoon = sunPosition(noon, 40.0, 0.0);
+      const relNoon = norm180(sunNoon.azimuth - 0);
+      safeAssert(Math.abs(relNoon) > 140, 'noon/north expected sun nearly dead-ahead/behind', relNoon);
+
+      const sunrise = new Date(Date.UTC(2024, 2, 20, 6, 30, 0));
+      const sunRise = sunPosition(sunrise, 40.0, 0.0);
+      if (sunRise.elevation > 0){
+        const relRise = norm180(sunRise.azimuth - 0);
+        safeAssert(Math.abs(Math.abs(relRise) - 90) < 45, 'sunrise/north expected strong side exposure', relRise);
+      }
+
+      const midnight = new Date(Date.UTC(2024, 2, 20, 0, 0, 0));
+      const sunNight = sunPosition(midnight, 40.0, 0.0);
+      safeAssert(sunNight.elevation < 0, 'midnight expected sun below horizon', sunNight.elevation);
+
+      console.log('[TREES under BUS] solar-position self-tests ran (see warnings above for any failures).');
+    } catch(e){ console.warn('[TREES under BUS] self-test error', e); }
+  }
+  runSelfTests();
+
+  /* ---------------- formatting ---------------- */
+  function fmtMin(sec){
+    const m = Math.round(sec/60);
+    if (m < 1) return '<1 min';
+    if (m < 60) return m + ' min';
+    const h = Math.floor(m/60), rem = m % 60;
+    return h + 'h ' + (rem ? rem + 'm' : '');
+  }
+  function fmtClock(date){
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  function fmtDeg(d){ return Math.round(d) + '°'; }
+  function fmtLatLon(lat, lon){ return lat.toFixed(4) + ', ' + lon.toFixed(4); }
+
+  /* ---------------- geocoding & routing ----------------
+     Home region: Tamil Nadu, India. We search there first (bounded viewbox +
+     countrycodes=in) so small local places like "Gandhipuram" or "Palladam"
+     surface correctly, then fall back to an unrestricted worldwide search if
+     the local one comes back empty — so this still works for any trip
+     anywhere, not just Tamil Nadu. */
+  const HOME_REGION = { name: 'Tamil Nadu, India', lat: 11.1271, lon: 78.6569,
+    // rough bounding box: [minLon,minLat,maxLon,maxLat] covering Tamil Nadu + margin
+    viewbox: '76.0,8.0,80.5,13.7' };
+
+  async function geocodeRaw(query, opts){
+    const params = new URLSearchParams({ format: 'json', limit: '6', q: query, addressdetails: '0' });
+    if (opts && opts.bounded){ params.set('viewbox', HOME_REGION.viewbox); params.set('bounded', '1'); }
+    if (opts && opts.countrycodes){ params.set('countrycodes', opts.countrycodes); }
+    const url = 'https://nominatim.openstreetmap.org/search?' + params.toString();
+    let res;
+    try {
+      res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    } catch(e){
+      throw new Error('NETWORK_BLOCKED');
+    }
+    if (!res.ok) throw new Error('Geocoding service unavailable');
+    return res.json();
+  }
+
+  async function geocode(query){
+    // 1) try biased to the home region first — best for local place names
+    let results = [];
+    try { results = await geocodeRaw(query, { bounded: true }); }
+    catch(e){ if (e.message === 'NETWORK_BLOCKED') throw e; }
+    if (results && results.length) return results;
+    // 2) fall back to an unrestricted global search (covers any other trip)
+    return geocodeRaw(query, {});
+  }
+
+  async function reverseGeocode(lat, lon){
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+    let res;
+    try {
+      res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    } catch(e){
+      throw new Error('NETWORK_BLOCKED');
+    }
+    if (!res.ok) throw new Error('Reverse geocoding unavailable');
+    const data = await res.json();
+    return (data && data.display_name) ? data.display_name : fmtLatLon(lat, lon);
+  }
+
+  async function fetchRoutes(origin, destination){
+    const url = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${destination.lon},${destination.lat}?alternatives=true&overview=full&geometries=geojson&steps=false`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Routing service unavailable');
+    const data = await res.json();
+    if (data.code !== 'Ok' || !data.routes || !data.routes.length) throw new Error(data.message || 'No route found between those points');
+    return data.routes;
+  }
+
+  /* ---------------- app state ---------------- */
+  const state = {
+    origin: null, destination: null, departure: null, mode: 'bus',
+    routes: [], activeRouteIndex: 0, deadzone: 40, layout: 'unknown'
+  };
+  let map = null, mapLayers = [];
+
+  /* ---------------- DOM refs ---------------- */
+  const $ = id => document.getElementById(id);
+  const fromInput = $('from-input'), toInput = $('to-input');
+  const fromSuggest = $('from-suggest'), toSuggest = $('to-suggest');
+  const dateInput = $('date-input'), timeInput = $('time-input'), modeInput = $('mode-input');
+  const form = $('trip-form'), errorBanner = $('error-banner');
+  const loading = $('loading'), loadingText = $('loading-text');
+  const resultsSection = $('results-section'), routeGrid = $('route-grid'), routeSub = $('route-sub');
+  const detailSection = $('detail-section');
+
+  /* ---------------- wizard step navigation ---------------- */
+  const steps = [$('step-0'), $('step-1'), $('step-2')];
+  const stepDots = $('step-dots');
+  function goToStep(n){
+    steps.forEach((el, i) => { el.hidden = (i !== n); });
+    stepDots.hidden = (n === 0);
+    document.querySelectorAll('.step-dots .dot').forEach((d,i) => d.classList.toggle('active', i === n));
+    if (n !== 0) clearError();
+  }
+  $('start-btn').addEventListener('click', () => goToStep(1));
+  $('to-step-2-btn').addEventListener('click', () => {
+    if (!fromInput.value.trim() || !toInput.value.trim()){
+      showError('Enter both a starting point and a destination first.');
+      return;
+    }
+    goToStep(2);
+  });
+  document.querySelectorAll('[data-back]').forEach(btn => {
+    btn.addEventListener('click', () => goToStep(parseInt(btn.dataset.back, 10)));
+  });
+
+  // default departure = now, local
+  function pad2(n){ return String(n).padStart(2, '0'); }
+  function setDateTimeValue(date){
+    dateInput.value = date.getFullYear() + '-' + pad2(date.getMonth()+1) + '-' + pad2(date.getDate());
+    timeInput.value = pad2(date.getHours()) + ':' + pad2(date.getMinutes());
+  }
+  function readDepartureDate(){
+    if (!dateInput.value || !timeInput.value) return null;
+    const [y,m,d] = dateInput.value.split('-').map(Number);
+    const [hh,mm] = timeInput.value.split(':').map(Number);
+    return new Date(y, m-1, d, hh, mm, 0, 0);
+  }
+  setDateTimeValue(new Date());
+
+  document.querySelectorAll('.time-quick button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.time;
+      const now = new Date();
+      if (key === 'now') setDateTimeValue(now);
+      else if (key === '+1h') setDateTimeValue(new Date(now.getTime() + 3600000));
+      else if (key === '+3h') setDateTimeValue(new Date(now.getTime() + 3*3600000));
+      else if (key === 'tomorrow-morning'){
+        const t = new Date(now);
+        t.setDate(t.getDate() + 1);
+        t.setHours(8,0,0,0);
+        setDateTimeValue(t);
+      }
+    });
+  });
+
+  let fromCoord = null, toCoord = null;
+
+  function showError(msg){
+    errorBanner.textContent = msg;
+    errorBanner.classList.add('show');
+  }
+  function clearError(){ errorBanner.classList.remove('show'); errorBanner.textContent=''; }
+
+  /* ---------------- autocomplete ---------------- */
+  function wireAutocomplete(input, box, onPick){
+    let debounceTimer = null;
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      if (debounceTimer) clearTimeout(debounceTimer);
+      if (q.length < 2){ box.hidden = true; box.innerHTML=''; return; }
+      box.innerHTML = '<div class="ac-status">Searching…</div>';
+      box.hidden = false;
+      debounceTimer = setTimeout(async () => {
+        try {
+          const results = await geocode(q);
+          if (input.value.trim() !== q) return; // stale response, user kept typing
+          if (!results.length){ box.innerHTML = '<div class="ac-status">No matches. Try a more specific name, or use "Pick on map."</div>'; return; }
+          box.innerHTML = '';
+          results.forEach(r => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = r.display_name;
+            b.addEventListener('click', () => {
+              input.value = r.display_name;
+              onPick({ lat: parseFloat(r.lat), lon: parseFloat(r.lon) });
+              box.hidden = true;
+            });
+            box.appendChild(b);
+          });
+          box.hidden = false;
+        } catch(e){
+          if (e && e.message === 'NETWORK_BLOCKED'){
+            box.innerHTML = '<div class="ac-status">Live search is blocked inside this preview window. Download the file (top-right ⋯ menu) and open it in your own browser to search — or drop a pin with "Pick on map."</div>';
+          } else {
+            box.innerHTML = '<div class="ac-status">Search is unavailable right now — try again, or pick on the map.</div>';
+          }
+        }
+      }, 350);
+    });
+    input.addEventListener('focus', () => { if (box.innerHTML && box.innerHTML !== '') box.hidden = false; });
+    document.addEventListener('click', (e) => {
+      if (!box.contains(e.target) && e.target !== input) box.hidden = true;
+    });
+  }
+  wireAutocomplete(fromInput, fromSuggest, c => fromCoord = c);
+  wireAutocomplete(toInput, toSuggest, c => toCoord = c);
+
+  $('swap-btn').addEventListener('click', () => {
+    [fromInput.value, toInput.value] = [toInput.value, fromInput.value];
+    [fromCoord, toCoord] = [toCoord, fromCoord];
+  });
+
+  /* ---------------- "use my location" (main form) ---------------- */
+  function useBrowserLocation(onDone, onError){
+    if (!navigator.geolocation){
+      onError('Your browser does not support location lookup. Try "Pick on map" instead.');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const lat = pos.coords.latitude, lon = pos.coords.longitude;
+      try {
+        const label = await reverseGeocode(lat, lon);
+        onDone({ lat, lon, label });
+      } catch(_){
+        onDone({ lat, lon, label: fmtLatLon(lat, lon) });
+      }
+    }, err => {
+      const denied = err && (err.code === 1 || /permissions policy|denied/i.test(err.message || ''));
+      const msg = denied
+        ? 'Location access is blocked inside this preview window. Download the file (top-right ⋯ menu) and open it in your own browser to use GPS — or tap "Pick on map" and drop a pin instead.'
+        : 'Could not get your location (' + (err && err.message ? err.message : 'unknown error') + '). Try "Pick on map" instead.';
+      onError(msg);
+    }, { enableHighAccuracy: true, timeout: 10000 });
+  }
+
+  $('use-location-btn').addEventListener('click', () => {
+    const btn = $('use-location-btn');
+    btn.disabled = true; btn.textContent = '◎ Locating…';
+    useBrowserLocation(
+      loc => { fromCoord = { lat: loc.lat, lon: loc.lon }; fromInput.value = loc.label; btn.disabled = false; btn.textContent = '◎ Use my location'; },
+      msg => { showError(msg); btn.disabled = false; btn.textContent = '◎ Use my location'; }
+    );
+  });
+
+  /* ---------------- location picker modal ---------------- */
+  const pickerOverlay = $('picker-overlay');
+  const pickerTitle = $('picker-title');
+  const pickerSearch = $('picker-search');
+  const pickerSuggest = $('picker-suggest');
+  const pickerSelected = $('picker-selected-text');
+  let pickerTarget = null; // 'from' | 'to'
+  let pickerMap = null, pickerMarker = null, pickerChoice = null;
+
+  function ensurePickerMap(){
+    if (pickerMap) return pickerMap;
+    pickerMap = L.map('picker-map').setView([HOME_REGION.lat, HOME_REGION.lon], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18, attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(pickerMap);
+    pickerMap.on('click', (e) => setPickerLocation(e.latlng.lat, e.latlng.lng));
+    return pickerMap;
+  }
+
+  function setPickerLocation(lat, lon, knownLabel){
+    if (!pickerMarker){
+      pickerMarker = L.marker([lat, lon], { draggable: true }).addTo(pickerMap);
+      pickerMarker.on('dragend', () => {
+        const p = pickerMarker.getLatLng();
+        setPickerLocation(p.lat, p.lng);
+      });
+    } else {
+      pickerMarker.setLatLng([lat, lon]);
+    }
+    pickerMap.panTo([lat, lon]);
+    if (knownLabel){
+      pickerChoice = { lat, lon, label: knownLabel };
+      pickerSelected.textContent = knownLabel;
+      return;
+    }
+    pickerSelected.textContent = 'Looking up address…';
+    reverseGeocode(lat, lon).then(label => {
+      pickerChoice = { lat, lon, label };
+      pickerSelected.textContent = label;
+    }).catch(() => {
+      const label = fmtLatLon(lat, lon);
+      pickerChoice = { lat, lon, label };
+      pickerSelected.textContent = label + ' (address lookup unavailable)';
+    });
+  }
+
+  function openPicker(which){
+    pickerTarget = which;
+    pickerTitle.textContent = which === 'from' ? 'Pick your starting point' : 'Pick your destination';
+    pickerChoice = null;
+    pickerSelected.textContent = 'No location chosen yet.';
+    pickerSearch.value = '';
+    pickerSuggest.hidden = true; pickerSuggest.innerHTML = '';
+    $('picker-nearby').hidden = true; $('picker-nearby').innerHTML = '';
+    clearNearbyMarkers();
+    pickerOverlay.classList.add('show');
+    ensurePickerMap();
+    setTimeout(async () => {
+      pickerMap.invalidateSize();
+      const existing = which === 'from' ? fromCoord : toCoord;
+      const typedText = ((which === 'from' ? fromInput.value : toInput.value) || '').trim();
+      if (existing){
+        if (pickerMarker){ pickerMap.removeLayer(pickerMarker); pickerMarker = null; }
+        setPickerLocation(existing.lat, existing.lon, typedText || undefined);
+        pickerMap.setView([existing.lat, existing.lon], 13);
+      } else {
+        if (pickerMarker){ pickerMap.removeLayer(pickerMarker); pickerMarker = null; }
+        if (typedText){
+          // center the map on whatever the person already typed, so "Pick on map"
+          // opens right where they meant, not on a generic regional view
+          try {
+            const results = await geocode(typedText);
+            if (results && results.length){
+              pickerMap.setView([parseFloat(results[0].lat), parseFloat(results[0].lon)], 13);
+            }
+          } catch(_){ /* keep default Tamil Nadu view */ }
+        }
+      }
+    }, 30);
+  }
+
+  function closePicker(){ pickerOverlay.classList.remove('show'); }
+
+  document.querySelectorAll('[data-open-picker]').forEach(btn => {
+    btn.addEventListener('click', () => openPicker(btn.dataset.openPicker));
+  });
+  $('picker-close').addEventListener('click', closePicker);
+  pickerOverlay.addEventListener('click', (e) => { if (e.target === pickerOverlay) closePicker(); });
+
+  wireAutocomplete(pickerSearch, pickerSuggest, (coord) => {
+    setPickerLocation(coord.lat, coord.lon, pickerSearch.value);
+    pickerMap.setView([coord.lat, coord.lon], 13);
+  });
+
+  /* ---------------- find nearby bus stands ---------------- */
+  let nearbyMarkers = [];
+  function clearNearbyMarkers(){
+    nearbyMarkers.forEach(m => pickerMap && pickerMap.removeLayer(m));
+    nearbyMarkers = [];
+  }
+
+  async function searchNearby(term){
+    const b = pickerMap.getBounds();
+    const viewbox = `${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}`;
+    const params = new URLSearchParams({ format: 'json', q: term, viewbox, bounded: '1', limit: '8' });
+    const url = 'https://nominatim.openstreetmap.org/search?' + params.toString();
+    let res;
+    try { res = await fetch(url, { headers: { 'Accept': 'application/json' } }); }
+    catch(e){ throw new Error('NETWORK_BLOCKED'); }
+    if (!res.ok) throw new Error('unavailable');
+    return res.json();
+  }
+
+  $('picker-find-busstands').addEventListener('click', async () => {
+    const btn = $('picker-find-busstands');
+    const nearbyBox = $('picker-nearby');
+    btn.disabled = true; btn.textContent = 'Searching…';
+    nearbyBox.hidden = false;
+    nearbyBox.innerHTML = '<div class="nl-status">Looking for bus stands in this map view…</div>';
+    clearNearbyMarkers();
+    try {
+      const results = await searchNearby('bus stand');
+      if (!results.length){
+        nearbyBox.innerHTML = '<div class="nl-status">No bus stands found in this view — zoom or pan the map, then try again.</div>';
+      } else {
+        nearbyBox.innerHTML = '';
+        results.forEach(r => {
+          const lat = parseFloat(r.lat), lon = parseFloat(r.lon);
+          const marker = L.circleMarker([lat, lon], { radius: 7, color: '#d98a1f', fillColor: '#f2a93b', fillOpacity: 0.9, weight: 2 }).addTo(pickerMap);
+          marker.bindPopup(r.display_name);
+          marker.on('click', () => setPickerLocation(lat, lon, r.display_name));
+          nearbyMarkers.push(marker);
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = '🚌 ' + r.display_name;
+          b.addEventListener('click', () => {
+            setPickerLocation(lat, lon, r.display_name);
+            pickerMap.setView([lat, lon], 15);
+          });
+          nearbyBox.appendChild(b);
+        });
+      }
+    } catch(e){
+      nearbyBox.innerHTML = (e && e.message === 'NETWORK_BLOCKED')
+        ? '<div class="nl-status">Blocked inside this preview window — download the file and open it in your own browser to use nearby search.</div>'
+        : '<div class="nl-status">Nearby search is unavailable right now — try again in a moment.</div>';
+    } finally {
+      btn.disabled = false; btn.textContent = '🚌 Find bus stands nearby';
+    }
+  });
+
+  $('picker-use-location').addEventListener('click', () => {
+    const btn = $('picker-use-location');
+    btn.disabled = true; btn.textContent = '◎ Locating…';
+    useBrowserLocation(
+      loc => {
+        setPickerLocation(loc.lat, loc.lon, loc.label);
+        pickerMap.setView([loc.lat, loc.lon], 13);
+        btn.disabled = false; btn.textContent = '◎ Use my current location';
+      },
+      msg => { pickerSelected.textContent = msg; btn.disabled = false; btn.textContent = '◎ Use my current location'; }
+    );
+  });
+
+  $('picker-confirm').addEventListener('click', () => {
+    if (!pickerChoice){
+      pickerSelected.textContent = 'Tap the map, search, or use your location first.';
+      return;
+    }
+    if (pickerTarget === 'from'){ fromCoord = { lat: pickerChoice.lat, lon: pickerChoice.lon }; fromInput.value = pickerChoice.label; }
+    else { toCoord = { lat: pickerChoice.lat, lon: pickerChoice.lon }; toInput.value = pickerChoice.label; }
+    closePicker();
+  });
+
+  /* ---------------- form submit ---------------- */
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearError();
+    const submitBtn = $('submit-btn');
+    if (!fromCoord){
+      try { const r = await geocode(fromInput.value.trim()); if (r.length) fromCoord = { lat: parseFloat(r[0].lat), lon: parseFloat(r[0].lon) }; }
+      catch(_){}
+    }
+    if (!toCoord){
+      try { const r = await geocode(toInput.value.trim()); if (r.length) toCoord = { lat: parseFloat(r[0].lat), lon: parseFloat(r[0].lon) }; }
+      catch(_){}
+    }
+    if (!fromCoord || !toCoord){
+      showError('Could not locate one of those places. Try a more specific address, pick a suggestion from the dropdown, or use "Pick on map."');
+      return;
+    }
+    const departure = readDepartureDate();
+    if (!departure){ showError('Pick a departure date and time.'); return; }
+
+    state.origin = fromCoord; state.destination = toCoord;
+    state.departure = departure;
+    state.mode = modeInput.value;
+    state.deadzone = TOLERANCE_WINDOWS[$('pref-select').value];
+
+    resultsSection.hidden = true; detailSection.hidden = true;
+    loading.classList.add('show');
+    loadingText.textContent = 'Tracing routes and tracking the sun…';
+    submitBtn.disabled = true;
+
+    try {
+      const rawRoutes = await fetchRoutes(state.origin, state.destination);
+      state.routes = rawRoutes.map(r => {
+        const coords = r.geometry.coordinates; // [lon,lat]
+        const segments = buildSegments(coords, r.duration, state.departure, state.deadzone);
+        const agg = aggregate(segments);
+        const runs = mergeRuns(segments);
+        return { geometry: coords, distance: r.distance, duration: r.duration, segments, runs, aggregate: agg };
+      });
+      state.activeRouteIndex = 0;
+      renderRouteCards();
+      renderDetail(0);
+      resultsSection.hidden = false;
+      detailSection.hidden = false;
+    } catch(err){
+      showError((err && err.message) ? err.message : 'Something went wrong finding a route. The public routing/geocoding demo services can be flaky — please try again in a moment.');
+    } finally {
+      loading.classList.remove('show');
+      submitBtn.disabled = false;
+    }
+  });
+
+  /* ---------------- rendering: route cards ---------------- */
+  function verdictText(agg){
+    if (agg.left < 1 && agg.right < 1) return { side: 'none', text: 'No significant sun expected on either side.' };
+    if (Math.abs(agg.left - agg.right) < 60) return { side: 'either', text: 'Both sides get similar sun — sit wherever.' };
+    const better = agg.left < agg.right ? 'left' : 'right';
+    return { side: better, text: `Sit on the ${better} — ` };
+  }
+
+  function renderRouteCards(){
+    routeGrid.innerHTML = '';
+    routeSub.textContent = state.routes.length > 1
+      ? `${state.routes.length} route options found between your points.`
+      : 'One route found between your points.';
+
+    state.routes.forEach((route, idx) => {
+      const agg = route.aggregate;
+      const total = agg.total || 1;
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'route-card' + (idx === state.activeRouteIndex ? ' active' : '');
+      const v = verdictText(agg);
+      card.innerHTML = `
+        <div class="rtitle">Route ${idx+1}${idx===0 ? ' · fastest' : ''}</div>
+        <div class="rmeta">${fmtMin(route.duration)} · ${(route.distance/1000).toFixed(0)} km</div>
+        <div class="side-bar">
+          <span class="l" style="width:${(agg.left/total*100).toFixed(1)}%"></span>
+          <span class="r" style="width:${(agg.right/total*100).toFixed(1)}%"></span>
+        </div>
+        <div class="verdict">
+          ${v.side === 'none' ? '<span class="pill none">no sun</span> ' : ''}
+          ${v.side === 'left' ? '<span class="pill left">left</span> ' : ''}
+          ${v.side === 'right' ? '<span class="pill right">right</span> ' : ''}
+          <span>L ${fmtMin(agg.left)} · R ${fmtMin(agg.right)}</span>
+        </div>
+      `;
+      card.addEventListener('click', () => {
+        state.activeRouteIndex = idx;
+        document.querySelectorAll('.route-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        renderDetail(idx);
+      });
+      routeGrid.appendChild(card);
+    });
+  }
+
+  /* ---------------- rendering: detail (map, timeline, dial, seats) ---------------- */
+  function ensureMap(){
+    if (map) return map;
+    map = L.map('map', { zoomControl: true, attributionControl: true });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18, attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    return map;
+  }
+
+  function sideColor(side){
+    return side === 'right' ? '#f2a93b' : side === 'left' ? '#2e6e62' : '#b9bec1';
+  }
+
+  function renderMap(route){
+    ensureMap();
+    mapLayers.forEach(l => map.removeLayer(l));
+    mapLayers = [];
+    const bounds = [];
+    route.runs.forEach(run => {
+      const latlngs = run.coords.map(c => [c[0], c[1]]);
+      const line = L.polyline(latlngs, { color: sideColor(run.side), weight: 5, opacity: 0.9 }).addTo(map);
+      mapLayers.push(line);
+      latlngs.forEach(p => bounds.push(p));
+    });
+    if (bounds.length) map.fitBounds(bounds, { padding: [24,24] });
+    setTimeout(() => map.invalidateSize(), 50);
+  }
+
+  function renderSeats(route){
+    const agg = route.aggregate;
+    let leftLabel = 'Left', rightLabel = 'Right';
+    if (state.layout === 'left2'){ leftLabel = '2-seater · Left'; rightLabel = '3-seater · Right'; }
+    if (state.layout === 'right2'){ leftLabel = '3-seater · Left'; rightLabel = '2-seater · Right'; }
+    $('label-left').textContent = leftLabel;
+    $('label-right').textContent = rightLabel;
+    $('time-left').textContent = fmtMin(agg.left);
+    $('time-right').textContent = fmtMin(agg.right);
+
+    const total = Math.max(agg.left, agg.right, 1);
+    $('side-left').style.background = `rgba(46,110,98,${0.06 + 0.22*(agg.left/total)})`;
+    $('side-right').style.background = `rgba(242,169,59,${0.06 + 0.22*(agg.right/total)})`;
+
+    const leftSeatCount = state.layout === 'left2' ? 2 : state.layout === 'right2' ? 3 : 3;
+    const rightSeatCount = state.layout === 'right2' ? 2 : state.layout === 'left2' ? 3 : 3;
+    $('seats-left').innerHTML = Array(leftSeatCount).fill('<div class="seat"></div>').join('');
+    $('seats-right').innerHTML = Array(rightSeatCount).fill('<div class="seat"></div>').join('');
+
+    const banner = $('verdict-banner');
+    const vbMain = $('vb-main'), vbSub = $('vb-sub');
+    const v = verdictText(agg);
+    if (v.side === 'none'){
+      banner.classList.add('none');
+      vbMain.textContent = 'No significant sun on this trip';
+      vbSub.textContent = 'Sun is below the horizon, or stays roughly ahead/behind the vehicle, for the whole route. Sit anywhere.';
+    } else if (v.side === 'either'){
+      banner.classList.remove('none');
+      vbMain.textContent = 'Either side works';
+      vbSub.textContent = `Left gets ${fmtMin(agg.left)} of sun, right gets ${fmtMin(agg.right)} — close enough not to matter.`;
+    } else {
+      banner.classList.remove('none');
+      const sideLabel = v.side === 'left' ? leftLabel : rightLabel;
+      vbMain.textContent = `Sit on the ${v.side}${state.layout !== 'unknown' ? ` (${sideLabel})` : ''}`;
+      const other = v.side === 'left' ? 'right' : 'left';
+      vbSub.textContent = `${fmtMin(agg[v.side])} of sun vs. ${fmtMin(agg[other])} on the ${other} — about ${fmtMin(Math.abs(agg.left-agg.right))} less glare.`;
+    }
+  }
+
+  function renderDetail(idx){
+    const route = state.routes[idx];
+    renderMap(route);
+    renderSeats(route);
+  }
+
+  document.querySelectorAll('.seat-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.seat-toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.layout = btn.id === 'layout-left2' ? 'left2' : btn.id === 'layout-right2' ? 'right2' : 'unknown';
+      renderSeats(state.routes[state.activeRouteIndex]);
+    });
+  });
+
+  $('pref-select').addEventListener('change', (e) => {
+    state.deadzone = TOLERANCE_WINDOWS[e.target.value];
+    if (!state.routes.length) return;
+    state.routes = state.routes.map(r => {
+      const segments = buildSegments(r.geometry, r.duration, state.departure, state.deadzone);
+      const agg = aggregate(segments);
+      const runs = mergeRuns(segments);
+      return { ...r, segments, runs, aggregate: agg };
+    });
+    renderRouteCards();
+    renderDetail(state.activeRouteIndex);
+  });
+
+  $('copy-link').addEventListener('click', async () => {
+    if (!state.origin || !state.destination) return;
+    const params = new URLSearchParams({
+      fLat: state.origin.lat, fLon: state.origin.lon, fName: fromInput.value,
+      tLat: state.destination.lat, tLon: state.destination.lon, tName: toInput.value,
+      d: dateInput.value, t: timeInput.value, mode: modeInput.value
+    });
+    const url = location.origin + location.pathname + '?' + params.toString();
+    try {
+      await navigator.clipboard.writeText(url);
+      $('copied-note').classList.add('show');
+      setTimeout(() => $('copied-note').classList.remove('show'), 2000);
+    } catch(_) { showError('Could not copy automatically — you can copy the address bar manually after sharing.'); }
+  });
+
+  /* ---------------- load from shared link ---------------- */
+  (function hydrateFromQuery(){
+    const p = new URLSearchParams(location.search);
+    if (!p.has('fLat') || !p.has('tLat')) return;
+    fromCoord = { lat: parseFloat(p.get('fLat')), lon: parseFloat(p.get('fLon')) };
+    toCoord = { lat: parseFloat(p.get('tLat')), lon: parseFloat(p.get('tLon')) };
+    fromInput.value = p.get('fName') || '';
+    toInput.value = p.get('tName') || '';
+    if (p.get('d')) dateInput.value = p.get('d');
+    if (p.get('t')) timeInput.value = p.get('t');
+    if (p.get('dt') && !p.get('d')){ // legacy shared links
+      const legacy = p.get('dt'); // e.g. 2026-08-23T06:58
+      const [dPart, tPart] = legacy.split('T');
+      if (dPart) dateInput.value = dPart;
+      if (tPart) timeInput.value = tPart.slice(0,5);
+    }
+    if (p.get('mode')) modeInput.value = p.get('mode');
+    setTimeout(() => form.requestSubmit(), 50);
+  })();
+
+})();
+</script>
+</body>
+</html>
