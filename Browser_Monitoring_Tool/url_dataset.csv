@@ -1,0 +1,22 @@
+url,title,category
+https://www.google.com,Google Search,Search
+https://www.google.com/search?q=python,Google Search - Python,Search
+https://www.google.com/search?q=ai,Google Search - AI,Search
+https://www.google.com/search?q=games,Google Search - Games,Search
+https://www.google.com/search?q=music,Google Search - Music,Search
+https://chat.openai.com,ChatGPT,AI/Chatbot
+https://chat.openai.com/?model=gpt-4,ChatGPT - GPT-4,AI/Chatbot
+https://chat.openai.com/share,ChatGPT Shared Conversation,AI/Chatbot
+https://platform.openai.com,OpenAI Platform,AI/Chatbot
+https://api.openai.com/v1/chat/completions,OpenAI API,AI/Chatbot
+https://www.youtube.com,YouTube,Entertainment
+https://www.youtube.com/watch?v=dQw4w9WgXcQ,YouTube Video,Entertainment
+https://www.youtube.com/feed/trending,YouTube Trending,Entertainment
+https://www.youtube.com/shorts,YouTube Shorts,Entertainment
+https://music.youtube.com,YouTube Music,Entertainment
+https://store.steampowered.com,Steam Store,Games
+https://www.epicgames.com,EPIC Games Store,Games
+https://www.riotgames.com,Riot Games,Games
+https://play.google.com/store/games,Google Play Games,Games
+https://www.miniclip.com,Miniclip Online Games,Games
+110.171.151.102,Portal Access,Portal

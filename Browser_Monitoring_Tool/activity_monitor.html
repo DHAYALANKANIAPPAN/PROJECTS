@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity Dashboard</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<style>
+body {
+    background-color: #f8f9fa;
+}
+#dataTableContainer, #chartContainer {
+    display: none;
+    transition: all 0.5s ease-in-out;
+}
+.card {
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.flagged-row {
+    background-color: #ffb3b3 !important;
+}
+.flag-indicator {
+    color: #dc3545;
+    margin-left: 5px;
+    font-size: 14px;
+}
+.flag-badge {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    margin-left: 5px;
+}
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+.spinner-border {
+    width: 4rem;
+    height: 4rem;
+}
+.summary-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.summary-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+}
+.summary-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+.filter-section {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+/* Login Modal Styles */
+#loginModal {
+    backdrop-filter: blur(5px);
+}
+.login-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.login-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px 20px 0 0 !important;
+    border: none;
+}
+.login-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-weight: bold;
+}
+.login-btn:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+</style>
+</head>
+<body class="p-4">
+
+<!-- Login Modal -->
+<div class="modal fade show" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="false" style="display: block; backdrop-filter: blur(5px);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content login-card">
+            <div class="modal-header login-header">
+                <h5 class="modal-title" id="loginModalLabel">🔒 Admin Login Required</h5>
+            </div>
+            <div class="modal-body p-4">
+                <div id="loginError" class="alert alert-danger" style="display: none;">
+                    ❌ Invalid username or password. Please try again.
+                </div>
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-bold">Username</label>
+                        <input type="text" class="form-control form-control-lg" id="username" placeholder="Enter admin username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label fw-bold">Password</label>
+                        <input type="password" class="form-control form-control-lg" id="password" placeholder="Enter admin password" required>
+                    </div>
+                    <button type="submit" class="btn login-btn w-100 text-white">
+                        🔑 Login to Dashboard
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Spinner -->
+<div id="loadingOverlay">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<!-- Main Dashboard Content (Hidden until login) -->
+<div id="dashboardContent" style="display: none;">
+    <div class="container text-center">
+        <h2 class="mb-3 text-primary">📊 Activity Monitoring Dashboard</h2>
+
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="summary-card">
+                    <p class="summary-number" id="totalRecords">0</p>
+                    <p class="summary-label">Total Records</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <p class="summary-number" id="flaggedRecords">0</p>
+                    <p class="summary-label">Flagged Items</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <p class="summary-number" id="totalLabs">0</p>
+                    <p class="summary-label">Active Labs</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <p class="summary-number" id="totalSystems">0</p>
+                    <p class="summary-label">Active Systems</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filter-section">
+            <h5 class="mb-3">🔍 Filter Data</h5>
+            
+            <div class="row justify-content-center">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Select Date: 
+                        <span id="dateFlag" class="flag-indicator" style="display: none;">🚩</span>
+                    </label>
+                    <input type="date" id="datePicker" class="form-control" onchange="onDateChange()">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Select Lab:
+                        <span id="labFlag" class="flag-indicator" style="display: none;">🚩</span>
+                    </label>
+                    <select id="labSelect" class="form-select" onchange="onLabChange()" disabled>
+                        <option value="">-- Select Lab --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Select System:
+                        <span id="systemFlag" class="flag-indicator" style="display: none;">🚩</span>
+                    </label>
+                    <select id="systemSelect" class="form-select" onchange="onSystemChange()" disabled>
+                        <option value="">-- Select System --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Select User:
+                        <span id="userFlag" class="flag-indicator" style="display: none;">🚩</span>
+                    </label>
+                    <select id="userSelect" class="form-select" onchange="onUserChange()" disabled>
+                        <option value="">-- Select User --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="mb-4">
+            <button class="btn btn-success me-2" onclick="toggleTable()">Show Raw Data</button>
+            <button class="btn btn-secondary me-2" onclick="reloadData()">🔄 Refresh Live Data</button>
+            <button class="btn btn-info" onclick="openPastDataModal()">📅 Past Data</button>
+            <button class="btn btn-warning" onclick="clearFilters()">🗑️ Clear Filters</button>
+            <button class="btn btn-primary" onclick="applyFilters()">✅ Apply Filters</button>
+        </div>
+
+        <!-- Current Selection Summary -->
+        <div class="alert alert-info mb-4" id="selectionSummary" style="display: none;">
+            <strong>Current Selection:</strong> 
+            <span id="selectedDateText"></span> | 
+            <span id="selectedLabText"></span> | 
+            <span id="selectedSystemText"></span> | 
+            <span id="selectedUserText"></span>
+            <span class="badge bg-danger ms-2" id="flaggedCountBadge" style="display: none;"></span>
+        </div>
+
+        <!-- No Data Message -->
+        <div class="alert alert-warning mb-4" id="noDataMessage" style="display: none;">
+            <strong>⚠️ No data found</strong> for the selected filters. Please try different criteria.
+        </div>
+
+        <!-- Chart -->
+        <div id="chartContainer" class="card p-3 mb-4">
+            <h5 class="text-center">📈 Category Distribution</h5>
+            <canvas id="activityChart" height="120"></canvas>
+        </div>
+
+        <!-- Raw Data Table -->
+        <div id="dataTableContainer" class="card p-3">
+            <h5 class="text-center">📋 Raw Activity Data</h5>
+            <div class="table-responsive">
+                <table class="table table-striped" id="dataTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Lab</th>
+                            <th>System</th>
+                            <th>User</th>
+                            <th>Category</th>
+                            <th>URL</th>
+                            <th>Timestamp</th>
+                            <th>Flag</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataBody"></tbody>
+                </table>
+            </div>
+            <button class="btn btn-danger mt-2" onclick="toggleTable()">Close Raw Data</button>
+        </div>
+    </div>
+
+    <!-- Past Data Modal -->
+    <div class="modal fade" id="pastDataModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header">
+            <h5 class="modal-title">📅 Fetch Past Data</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-start">
+            <label class="fw-bold">Select Date:</label>
+            <input type="date" id="pastDate" class="form-control mb-3" onchange="onPastDateChange()">
+
+            <label class="fw-bold">Select Lab:</label>
+            <select id="pastLab" class="form-select mb-3" onchange="onPastLabChange()" disabled>
+              <option value="">-- Choose Lab --</option>
+            </select>
+
+            <label class="fw-bold">Select System:</label>
+            <select id="pastSystem" class="form-select mb-3" disabled>
+              <option value="">-- Choose System --</option>
+            </select>
+
+            <div id="pastDataMessage" class="alert alert-info mt-3" style="display: none;">
+                <!-- Message will be shown here -->
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary" onclick="fetchPastData()">Fetch Data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let chart;
+let allData = [];
+let labs = {};
+let selectedDate = "";
+let selectedLab = "";
+let selectedSystem = "";
+let selectedUser = "";
+let filtersApplied = false;
+
+// Authentication state
+let isAuthenticated = false;
+let authUsername = '';
+let authPassword = '';
+
+function showLoading() { 
+    console.log("Showing loading...");
+    document.getElementById("loadingOverlay").style.display = "flex"; 
+}
+function hideLoading() { 
+    console.log("Hiding loading...");
+    document.getElementById("loadingOverlay").style.display = "none"; 
+}
+
+// Login functionality
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const errorDiv = document.getElementById('loginError');
+    
+    if (!username || !password) {
+        errorDiv.textContent = '❌ Please enter both username and password.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        // Test authentication by making a simple API call
+        const response = await axios.get('/health', {
+            auth: { username, password }
+        });
+        
+        // If we get here, authentication was successful
+        isAuthenticated = true;
+        authUsername = username;
+        authPassword = password;
+        
+        // Hide login modal and show dashboard
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'block';
+        
+        // Initialize dashboard
+        initializeDashboard();
+        
+    } catch (error) {
+        console.error('Login failed:', error);
+        errorDiv.textContent = '❌ Invalid username or password. Please try again.';
+        errorDiv.style.display = 'block';
+        
+        // Clear password field
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+    } finally {
+        hideLoading();
+    }
+});
+
+// Custom axios instance with authentication
+const authAxios = axios.create();
+authAxios.interceptors.request.use(config => {
+    if (isAuthenticated) {
+        config.auth = {
+            username: authUsername,
+            password: authPassword
+        };
+    }
+    return config;
+});
+
+// Remove browser authentication prompts
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response && error.response.status === 401) {
+            // Don't show browser auth prompt, handle it in our custom login
+            return Promise.reject(error);
+        }
+        return Promise.reject(error);
+    }
+);
+
+function initializeDashboard() {
+    console.log("Dashboard loaded - starting data refresh");
+    // Set today's date by default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById("datePicker").value = today;
+    selectedDate = today;
+    
+    loadLiveData();
+}
+
+async function loadLiveData() {
+    console.log("Loading live data...");
+    showLoading();
+    try {
+        const res = await authAxios.get("/data");
+        allData = res.data || [];
+        console.log("Loaded data:", allData.length, "records");
+        
+        updateSummaryCards();
+        
+        // Only auto-load labs if no filters are applied yet
+        if (selectedDate && !filtersApplied) {
+            console.log("Auto-loading labs for date:", selectedDate);
+            await loadLabs(selectedDate);
+        }
+        
+        // If filters are applied, re-apply them
+        if (filtersApplied) {
+            applyFilters();
+        }
+        
+    } catch (err) {
+        console.error("Error fetching data:", err);
+        if (err.response && err.response.status === 401) {
+            handleAuthError();
+        }
+    } finally {
+        hideLoading();
+    }
+}
+
+function handleAuthError() {
+    // Show login modal again
+    isAuthenticated = false;
+    document.getElementById('loginModal').style.display = 'block';
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('loginError').textContent = '❌ Session expired. Please login again.';
+    document.getElementById('loginError').style.display = 'block';
+}
+
+function updateSummaryCards() {
+    document.getElementById("totalRecords").textContent = allData.length;
+    
+    const flaggedCount = allData.filter(r => r.flagged === 1).length;
+    document.getElementById("flaggedRecords").textContent = flaggedCount;
+    
+    const uniqueLabs = new Set(allData.map(r => r.lab_name));
+    document.getElementById("totalLabs").textContent = uniqueLabs.size;
+    
+    const uniqueSystems = new Set(allData.map(r => r.system_name));
+    document.getElementById("totalSystems").textContent = uniqueSystems.size;
+}
+
+function updateSelectionSummary() {
+    const summary = document.getElementById("selectionSummary");
+    const currentData = getFilteredData();
+    
+    if (currentData.length > 0) {
+        document.getElementById("selectedDateText").textContent = selectedDate || "All Dates";
+        document.getElementById("selectedLabText").textContent = selectedLab || "All Labs";
+        document.getElementById("selectedSystemText").textContent = selectedSystem || "All Systems";
+        document.getElementById("selectedUserText").textContent = selectedUser || "All Users";
+        
+        const flaggedCount = currentData.filter(r => r.flagged === 1).length;
+        const flaggedBadge = document.getElementById("flaggedCountBadge");
+        if (flaggedCount > 0) {
+            flaggedBadge.textContent = `${flaggedCount} Flagged`;
+            flaggedBadge.style.display = "inline";
+        } else {
+            flaggedBadge.style.display = "none";
+        }
+        
+        summary.style.display = "block";
+        document.getElementById("noDataMessage").style.display = "none";
+    } else {
+        summary.style.display = "none";
+        document.getElementById("noDataMessage").style.display = "block";
+    }
+}
+
+function onDateChange() {
+    selectedDate = document.getElementById("datePicker").value;
+    console.log("Date changed to:", selectedDate);
+    updateFlagIndicators();
+    
+    if (!selectedDate) {
+        clearFilters();
+        return;
+    }
+    
+    // Load labs for the selected date
+    loadLabs(selectedDate);
+}
+
+async function loadLabs(date) {
+    console.log("Loading labs for date:", date);
+    showLoading();
+    try {
+        const res = await authAxios.get(`/labs?date=${date}`);
+        labs = res.data || {};
+        console.log("Labs loaded:", Object.keys(labs).length, "labs");
+        
+        const labSelect = document.getElementById("labSelect");
+        labSelect.innerHTML = `<option value="">-- Select Lab --</option>`;
+        
+        if (Object.keys(labs).length === 0) {
+            console.log("No labs found for date:", date);
+            labSelect.disabled = true;
+            document.getElementById("systemSelect").disabled = true;
+            document.getElementById("userSelect").disabled = true;
+            
+            // Show no data message
+            document.getElementById("chartContainer").style.display = "none";
+            document.getElementById("dataTableContainer").style.display = "none";
+            document.getElementById("noDataMessage").style.display = "block";
+            document.getElementById("noDataMessage").innerHTML = `<strong>⚠️ No data found</strong> for date: ${date}. Please select a different date.`;
+            
+            hideLoading();
+            return;
+        }
+        
+        Object.keys(labs).forEach(lab => {
+            const opt = document.createElement("option");
+            opt.value = lab;
+            const hasFlagged = labs[lab].some(sys => sys.flagged === 1);
+            opt.textContent = lab + (hasFlagged ? " 🚩" : "");
+            opt.dataset.flagged = hasFlagged;
+            labSelect.appendChild(opt);
+        });
+        
+        labSelect.disabled = false;
+        document.getElementById("systemSelect").disabled = true;
+        document.getElementById("userSelect").disabled = true;
+        updateFlagIndicators();
+        
+        hideLoading();
+        
+    } catch (err) {
+        console.error("Error loading labs:", err);
+        if (err.response && err.response.status === 401) {
+            handleAuthError();
+        }
+        hideLoading();
+    }
+}
+
+function onLabChange() {
+    selectedLab = document.getElementById("labSelect").value;
+    console.log("Lab changed to:", selectedLab);
+    const systemSelect = document.getElementById("systemSelect");
+    systemSelect.innerHTML = `<option value="">-- Select System --</option>`;
+    
+    if (!selectedLab || !labs[selectedLab]) {
+        systemSelect.disabled = true;
+        document.getElementById("userSelect").disabled = true;
+        updateFlagIndicators();
+        return;
+    }
+    
+    labs[selectedLab].forEach(sys => {
+        const opt = document.createElement("option");
+        opt.value = sys.system_name;
+        opt.textContent = sys.system_name + (sys.flagged === 1 ? " 🚩" : "");
+        opt.dataset.flagged = sys.flagged === 1;
+        systemSelect.appendChild(opt);
+    });
+    
+    systemSelect.disabled = false;
+    document.getElementById("userSelect").disabled = true;
+    updateFlagIndicators();
+}
+
+function onSystemChange() {
+    selectedSystem = document.getElementById("systemSelect").value;
+    console.log("System changed to:", selectedSystem);
+    
+    if (!selectedSystem) {
+        document.getElementById("userSelect").disabled = true;
+        updateFlagIndicators();
+        return;
+    }
+
+    // Populate user dropdown dynamically
+    const users = [...new Set(allData
+        .filter(r => r.lab_name === selectedLab && r.system_name === selectedSystem)
+        .map(r => r.user_name || 'Unknown')
+    )];
+    
+    console.log("Found users:", users);
+    
+    const userSelect = document.getElementById("userSelect");
+    userSelect.innerHTML = `<option value="">-- Select User --</option>`;
+    
+    users.forEach(u => {
+        const opt = document.createElement("option");
+        opt.value = u;
+        // Check if user has any flagged items
+        const userFlagged = allData.some(r => 
+            r.lab_name === selectedLab && 
+            r.system_name === selectedSystem && 
+            r.user_name === u && 
+            r.flagged === 1
+        );
+        opt.textContent = u + (userFlagged ? " 🚩" : "");
+        opt.dataset.flagged = userFlagged;
+        userSelect.appendChild(opt);
+    });
+    
+    userSelect.disabled = users.length === 0;
+    updateFlagIndicators();
+}
+
+function onUserChange() {
+    selectedUser = document.getElementById("userSelect").value;
+    console.log("User changed to:", selectedUser);
+    updateFlagIndicators();
+}
+
+function applyFilters() {
+    console.log("Applying filters...");
+    filtersApplied = true;
+    
+    const dataToShow = getFilteredData();
+    console.log("Filtered data count:", dataToShow.length);
+    
+    if (dataToShow.length > 0) {
+        console.log("Showing chart and table with", dataToShow.length, "records");
+        document.getElementById("chartContainer").style.display = "block";
+        document.getElementById("dataTableContainer").style.display = "block";
+        document.getElementById("noDataMessage").style.display = "none";
+        renderChart(dataToShow);
+        renderTable(dataToShow);
+    } else {
+        console.log("No data to display - hiding chart and table");
+        document.getElementById("chartContainer").style.display = "none";
+        document.getElementById("dataTableContainer").style.display = "none";
+        document.getElementById("noDataMessage").style.display = "block";
+        document.getElementById("noDataMessage").innerHTML = `<strong>⚠️ No data found</strong> for the selected filters. Please try different criteria.`;
+    }
+    
+    updateSelectionSummary();
+    updateFlagIndicators();
+}
+
+function getFilteredData() {
+    let dataToShow = allData;
+    
+    // Apply date filter
+    if (selectedDate) {
+        dataToShow = dataToShow.filter(r => r.timestamp.startsWith(selectedDate));
+    }
+    
+    // Apply lab filter
+    if (selectedLab) {
+        dataToShow = dataToShow.filter(r => r.lab_name === selectedLab);
+    }
+    
+    // Apply system filter
+    if (selectedSystem) {
+        dataToShow = dataToShow.filter(r => r.system_name === selectedSystem);
+    }
+    
+    // Apply user filter
+    if (selectedUser) {
+        dataToShow = dataToShow.filter(r => r.user_name === selectedUser);
+    }
+    
+    console.log("Filtered data:", {
+        total: allData.length,
+        filtered: dataToShow.length,
+        filters: { selectedDate, selectedLab, selectedSystem, selectedUser }
+    });
+    
+    return dataToShow;
+}
+
+function clearFilters() {
+    console.log("Clearing all filters");
+    selectedDate = "";
+    selectedLab = "";
+    selectedSystem = "";
+    selectedUser = "";
+    filtersApplied = false;
+    
+    document.getElementById("datePicker").value = "";
+    document.getElementById("labSelect").value = "";
+    document.getElementById("systemSelect").value = "";
+    document.getElementById("userSelect").value = "";
+    
+    document.getElementById("labSelect").disabled = true;
+    document.getElementById("systemSelect").disabled = true;
+    document.getElementById("userSelect").disabled = true;
+    
+    // Reset to show all data
+    document.getElementById("chartContainer").style.display = "block";
+    document.getElementById("dataTableContainer").style.display = "block";
+    document.getElementById("noDataMessage").style.display = "none";
+    
+    updateFlagIndicators();
+    
+    // Render all data
+    if (allData.length > 0) {
+        renderChart(allData);
+        renderTable(allData);
+    }
+    
+    updateSelectionSummary();
+}
+
+function toggleTable() {
+    const tableDiv = document.getElementById("dataTableContainer");
+    tableDiv.style.display = tableDiv.style.display === "none" ? "block" : "none";
+    console.log("Table toggled, display:", tableDiv.style.display);
+}
+
+function reloadData() { 
+    console.log("Manual refresh triggered");
+    loadLiveData(); 
+}
+
+function openPastDataModal() {
+    // Clear previous selections
+    document.getElementById("pastDate").value = "";
+    document.getElementById("pastLab").innerHTML = "<option value=''>-- Choose Lab --</option>";
+    document.getElementById("pastSystem").innerHTML = "<option value=''>-- Choose System --</option>";
+    document.getElementById("pastLab").disabled = true;
+    document.getElementById("pastSystem").disabled = true;
+    document.getElementById("pastDataMessage").style.display = "none";
+    
+    const modal = new bootstrap.Modal(document.getElementById("pastDataModal"));
+    modal.show();
+}
+
+function updateFlagIndicators() {
+    const dateFlag = document.getElementById("dateFlag");
+    const labFlag = document.getElementById("labFlag");
+    const systemFlag = document.getElementById("systemFlag");
+    const userFlag = document.getElementById("userFlag");
+    
+    // Date flag - show if any data for this date has flags
+    const dateHasFlags = selectedDate && allData.some(r => 
+        r.timestamp.startsWith(selectedDate) && r.flagged === 1
+    );
+    dateFlag.style.display = dateHasFlags ? "inline" : "none";
+    
+    // Lab flag
+    const labHasFlags = selectedLab && labs[selectedLab] && 
+        labs[selectedLab].some(sys => sys.flagged === 1);
+    labFlag.style.display = labHasFlags ? "inline" : "none";
+    
+    // System flag
+    const systemOption = document.querySelector(`#systemSelect option[value="${selectedSystem}"]`);
+    const systemHasFlags = systemOption && systemOption.dataset.flagged === "true";
+    systemFlag.style.display = systemHasFlags ? "inline" : "none";
+    
+    // User flag
+    const userOption = document.querySelector(`#userSelect option[value="${selectedUser}"]`);
+    const userHasFlags = userOption && userOption.dataset.flagged === "true";
+    userFlag.style.display = userHasFlags ? "inline" : "none";
+}
+
+function renderChart(data) {
+    const ctx = document.getElementById('activityChart').getContext('2d');
+    const categoryCount = {};
+    data.forEach(r => {
+        if (r.category) categoryCount[r.category] = (categoryCount[r.category] || 0) + 1;
+    });
+    const labels = Object.keys(categoryCount);
+    const values = Object.values(categoryCount);
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels.length ? labels : ["No Data"],
+            datasets: [{
+                data: values.length ? values : [1],
+                backgroundColor: ['#36a2eb','#ff6384','#ff9f40','#4bc0c0','#9966ff','#ffcd56','#c9cbcf','#4dc9f6','#f67019','#537bc4'],
+                borderWidth: 1
+            }]
+        },
+        options: { 
+            responsive: true, 
+            animation: { animateScale: true },
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderTable(data) {
+    const body = document.getElementById("dataBody");
+    body.innerHTML = "";
+    data.forEach(r => {
+        const tr = document.createElement("tr");
+        if (r.flagged === 1) tr.classList.add("flagged-row");
+        tr.innerHTML = `
+            <td>${r.id}</td>
+            <td>${r.lab_name}</td>
+            <td>${r.system_name}</td>
+            <td>${r.user_name || '-'}</td>
+            <td>${r.category}</td>
+            <td><a href="${r.url}" target="_blank">${r.url.substring(0, 50)}${r.url.length > 50 ? '...' : ''}</a></td>
+            <td>${new Date(r.timestamp).toLocaleString()}</td>
+            <td>
+                <button class="btn btn-sm ${r.flagged ? 'btn-warning' : 'btn-outline-danger'}"
+                    onclick="toggleFlag('${r.id}', ${r.flagged})">
+                    ${r.flagged ? '🚩 Unflag' : 'Flag'}
+                </button>
+            </td>
+        `;
+        body.appendChild(tr);
+    });
+}
+
+async function toggleFlag(id, flagged) {
+    showLoading();
+    const endpoint = flagged ? "/unflag" : "/flag";
+    try {
+        await authAxios.post(endpoint, { id });
+        // Reload data to reflect changes
+        await loadLiveData();
+        // Re-apply current filters
+        if (filtersApplied) {
+            applyFilters();
+        }
+    } catch (err) {
+        console.error("Error toggling flag:", err);
+        if (err.response && err.response.status === 401) {
+            handleAuthError();
+        } else {
+            // Use custom modal instead of alert
+            showCustomAlert("Error updating flag status");
+        }
+    } finally {
+        hideLoading();
+    }
+}
+
+// Custom alert function to avoid browser alerts
+function showCustomAlert(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-warning alert-dismissible fade show position-fixed';
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Past data modal functions
+async function onPastDateChange() {
+    const date = document.getElementById("pastDate").value;
+    if (!date) return;
+    
+    showLoading();
+    try {
+        const res = await authAxios.get(`/labs?date=${date}`);
+        const labsData = res.data || {};
+        const pastLab = document.getElementById("pastLab");
+        pastLab.innerHTML = `<option value="">-- Choose Lab --</option>`;
+        
+        if (Object.keys(labsData).length === 0) {
+            pastLab.disabled = true;
+            document.getElementById("pastSystem").disabled = true;
+            document.getElementById("pastDataMessage").style.display = "block";
+            document.getElementById("pastDataMessage").innerHTML = 
+                `<strong>⚠️ No data found</strong> for date: ${date}. Please select a different date.`;
+            hideLoading();
+            return;
+        }
+        
+        Object.keys(labsData).forEach(lab => {
+            const opt = document.createElement("option");
+            opt.value = lab;
+            const hasFlagged = labsData[lab].some(sys => sys.flagged === 1);
+            opt.textContent = lab + (hasFlagged ? " 🚩" : "");
+            pastLab.appendChild(opt);
+        });
+        
+        pastLab.disabled = false;
+        document.getElementById("pastSystem").innerHTML = `<option value="">-- Choose System --</option>`;
+        document.getElementById("pastSystem").disabled = true;
+        document.getElementById("pastDataMessage").style.display = "none";
+        
+    } catch (err) {
+        console.error("Error loading past labs:", err);
+        if (err.response && err.response.status === 401) {
+            handleAuthError();
+        }
+        document.getElementById("pastDataMessage").style.display = "block";
+        document.getElementById("pastDataMessage").innerHTML = 
+            `<strong>❌ Error loading data</strong> for date: ${date}. Please try again.`;
+    } finally {
+        hideLoading();
+    }
+}
+
+async function onPastLabChange() {
+    const lab = document.getElementById("pastLab").value;
+    const date = document.getElementById("pastDate").value;
+    if (!lab || !date) return;
+    
+    showLoading();
+    try {
+        const res = await authAxios.get(`/labs?date=${date}`);
+        const labsData = res.data || {};
+        const systems = labsData[lab] || [];
+        
+        const pastSystem = document.getElementById("pastSystem");
+        pastSystem.innerHTML = `<option value="">-- Choose System --</option>`;
+        
+        if (systems.length === 0) {
+            pastSystem.disabled = true;
+            document.getElementById("pastDataMessage").style.display = "block";
+            document.getElementById("pastDataMessage").innerHTML = 
+                `<strong>⚠️ No systems found</strong> for lab: ${lab} on date: ${date}.`;
+            hideLoading();
+            return;
+        }
+        
+        systems.forEach(sys => {
+            const opt = document.createElement("option");
+            opt.value = sys.system_name;
+            opt.textContent = sys.system_name + (sys.flagged === 1 ? " 🚩" : "");
+            pastSystem.appendChild(opt);
+        });
+        
+        pastSystem.disabled = false;
+        document.getElementById("pastDataMessage").style.display = "none";
+        
+    } catch (err) {
+        console.error("Error loading systems:", err);
+        if (err.response && err.response.status === 401) {
+            handleAuthError();
+        }
+    } finally {
+        hideLoading();
+    }
+}
+
+async function fetchPastData() {
+    const date = document.getElementById("pastDate").value;
+    const lab = document.getElementById("pastLab").value;
+    const system = document.getElementById("pastSystem").value;
+    
+    if (!date) {
+        showCustomAlert("Please select a date.");
+        return;
+    }
+    
+    showLoading();
+    try {
+        const res = await authAxios.get(`/data?date=${date}&limit=1000`);
+        
+        let filteredData = res.data || [];
+        
+        // Apply lab filter if selected
+        if (lab) {
+            filteredData = filteredData.filter(r => r.lab_name === lab);
+        }
+        
+        // Apply system filter if selected
+        if (system) {
+            filteredData = filteredData.filter(r => r.system_name === system);
+        }
+        
+        if (filteredData.length === 0) {
+            showCustomAlert("No data found for the selected filters.");
+            hideLoading();
+            return;
+        }
+        
+        // Update global data and filters
+        allData = filteredData;
+        
+        // Set the main filters to match past data selection
+        selectedDate = date;
+        selectedLab = lab || "";
+        selectedSystem = system || "";
+        selectedUser = "";
+        filtersApplied = true;
+        
+        // Update UI elements
+        document.getElementById("datePicker").value = date;
+        
+        // Reload labs for the main filter
+        await loadLabs(date);
+        
+        // Set lab selection if specified
+        if (lab) {
+            document.getElementById("labSelect").value = lab;
+            selectedLab = lab;
+            onLabChange();
+            
+            // Set system selection if specified
+            if (system) {
+                document.getElementById("systemSelect").value = system;
+                selectedSystem = system;
+                onSystemChange();
+            }
+        }
+        
+        // Apply filters to render the data
+        applyFilters();
+        
+        bootstrap.Modal.getInstance(document.getElementById("pastDataModal")).hide();
+        
+    } catch (err) {
+        console.error("Error fetching past data:", err);
+        if (err.response && err.response.status === 401) {
+            handleAuthError();
+        } else {
+            showCustomAlert("Error fetching data for selected date");
+        }
+    } finally {
+        hideLoading();
+    }
+}
+</script>
+</body>
+</html>
