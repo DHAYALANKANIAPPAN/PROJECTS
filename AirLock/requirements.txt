@@ -1,0 +1,16 @@
+# Airlock Dependencies
+# Core
+boto3>=1.28.0
+pydantic>=2.0.0
+
+# Evaluation & Metrics
+numpy>=1.24.0
+
+# Testing
+pytest>=7.4.0
+
+# Interactive Demo
+streamlit>=1.24.0
+
+#installs and imports on Python 3.13; agent not yet run against Bedrock
+strands-agents==1.61.1

@@ -1,0 +1,4 @@
+{
+  "_comment": "Fill from the AWS Bedrock pricing page for YOUR region/model, then commit. Values are USD per 1,000 tokens. Left null on purpose: cost is reported as 'not computed' rather than guessed.",
+  "_model_id_example": {"input_per_1k": null, "output_per_1k": null}
+}

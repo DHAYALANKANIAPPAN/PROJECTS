@@ -1,0 +1,20 @@
+{
+  "seed": 20261017,
+  "method": "stratified 50/50 by (label, category); dev gets extra row when odd",
+  "dev": {
+    "rows": 101,
+    "labels": {
+      "attack": 30,
+      "benign": 71
+    },
+    "sha256": "9b37342c70937f66667aff98c36a67e267f29427328fd241333c322a02b973bf"
+  },
+  "test": {
+    "rows": 99,
+    "labels": {
+      "attack": 30,
+      "benign": 69
+    },
+    "sha256": "ccaa8ceef1b082ac287a44b2288144e653a55c55a8b85182156375cf22aff769"
+  }
+}

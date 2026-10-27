@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "airlock"
+version = "0.1.0"
+description = "Dual-gate defense for AI email agents against indirect prompt injection"
+readme = "docs/article.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Dhayalan Kaniappan"}
+]
+dependencies = [
+    "boto3>=1.28.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+]
+demo = [
+    "streamlit>=1.24.0",
+]
