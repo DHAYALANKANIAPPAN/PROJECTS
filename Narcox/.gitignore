@@ -1,0 +1,9 @@
+node_modules/
+.env
+<<<<<<< Updated upstream
+.env.*
+!.env.example
+=======
+.vercel/
+.vercel
+>>>>>>> Stashed changes

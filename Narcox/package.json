@@ -1,0 +1,15 @@
+{
+  "name": "narcox",
+  "version": "1.0.0",
+  "description": "Detection engine, risk scoring, and network graph for identifying drug-sale activity hidden behind slang, emojis, leetspeak, and Hinglish.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/detector.test.js && node test/webhooks.test.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "dotenv": "^18.0.2",
+    "mongodb": "^7.6.0"
+  }
+}

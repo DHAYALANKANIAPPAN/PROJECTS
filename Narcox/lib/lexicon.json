@@ -1,0 +1,111 @@
+{
+  "terms": [
+    {"t":"heroin","cat":"opioid","w":9},{"t":"brown sugar","cat":"opioid","w":8},
+    {"t":"smack","cat":"opioid","w":8},{"t":"china white","cat":"opioid","w":8},
+    {"t":"black tar","cat":"opioid","w":8},{"t":"dope","cat":"opioid","w":4},
+    {"t":"fentanyl","cat":"opioid","w":10},{"t":"carfentanil","cat":"opioid","w":10},
+    {"t":"junk","cat":"opioid","w":4},{"t":"afeem","cat":"opioid","w":6},
+    {"t":"opium","cat":"opioid","w":6},
+
+    {"t":"cocaine","cat":"stimulant","w":9},{"t":"coke","cat":"stimulant","w":6},
+    {"t":"crack","cat":"stimulant","w":9},{"t":"blow","cat":"stimulant","w":6},
+    {"t":"snow","cat":"stimulant","w":5},{"t":"crystal","cat":"stimulant","w":7},
+    {"t":"meth","cat":"stimulant","w":9},{"t":"ice","cat":"stimulant","w":6},
+    {"t":"speed","cat":"stimulant","w":6},
+
+    {"t":"mdma","cat":"synthetic","w":8},{"t":"molly","cat":"synthetic","w":6},
+    {"t":"mephedrone","cat":"synthetic","w":8},{"t":"meow meow","cat":"synthetic","w":8},
+    {"t":"ecstasy","cat":"synthetic","w":8},{"t":"xtc","cat":"synthetic","w":7},
+    {"t":"bath salts","cat":"synthetic","w":7},
+
+    {"t":"lsd","cat":"psychedelic","w":8},{"t":"acid","cat":"psychedelic","w":7},
+    {"t":"shrooms","cat":"psychedelic","w":6},{"t":"magic mushroom","cat":"psychedelic","w":6},
+    {"t":"dmt","cat":"psychedelic","w":7},{"t":"ketamine","cat":"psychedelic","w":7},
+    {"t":"special k","cat":"psychedelic","w":6},{"t":"tabs","cat":"psychedelic","w":5},
+    {"t":"blotter","cat":"psychedelic","w":6},{"t":"mescaline","cat":"psychedelic","w":6},
+    {"t":"peyote","cat":"psychedelic","w":6},
+
+    {"t":"ghb","cat":"dissociative","w":7},{"t":"rohypnol","cat":"dissociative","w":7},
+    {"t":"roofies","cat":"dissociative","w":7},{"t":"nitrous","cat":"dissociative","w":4},
+    {"t":"whip-its","cat":"dissociative","w":4},{"t":"poppers","cat":"dissociative","w":4},
+
+    {"t":"k2","cat":"synthetic_cannabinoid","w":7},{"t":"spice","cat":"synthetic_cannabinoid","w":4},
+
+    {"t":"charas","cat":"cannabis","w":5},{"t":"ganja","cat":"cannabis","w":5},
+    {"t":"kanja","cat":"cannabis","w":5},{"t":"weed","cat":"cannabis","w":4},
+    {"t":"pot","cat":"cannabis","w":3},{"t":"grass","cat":"cannabis","w":4},
+    {"t":"hash","cat":"cannabis","w":5},{"t":"bhang","cat":"cannabis","w":4},
+    {"t":"hydro","cat":"cannabis","w":4},{"t":"gaanja","cat":"cannabis","w":5},
+    {"t":"patta","cat":"cannabis","w":3},
+
+    {"t":"tramadol","cat":"pharma","w":5},{"t":"xanax","cat":"pharma","w":6},
+    {"t":"alprazolam","cat":"pharma","w":6},{"t":"codeine","cat":"pharma","w":5},
+    {"t":"oxycontin","cat":"pharma","w":7},{"t":"oxy","cat":"pharma","w":5},
+    {"t":"benzos","cat":"pharma","w":5},
+
+    {"t":"maal","cat":"slang","w":4},{"t":"stuff","cat":"slang","w":1},
+    {"t":"parcel","cat":"slang","w":2},{"t":"packet","cat":"slang","w":2},
+    {"t":"goods","cat":"slang","w":2},{"t":"cheez","cat":"slang","w":3},
+    {"t":"safed","cat":"slang","w":3},{"t":"kaala","cat":"slang","w":2},
+
+    {"t":"चरस","cat":"cannabis","w":5,"lang":"hi/mr","note":"charas"},
+    {"t":"गांजा","cat":"cannabis","w":5,"lang":"hi/mr","note":"ganja"},
+    {"t":"भांग","cat":"cannabis","w":4,"lang":"hi/mr","note":"bhang"},
+    {"t":"अफीम","cat":"opioid","w":6,"lang":"hi/mr","note":"afeem/opium"},
+    {"t":"स्मैक","cat":"opioid","w":8,"lang":"hi/mr","note":"smack"},
+    {"t":"माल","cat":"slang","w":4,"lang":"hi/mr","note":"maal (Devanagari)"},
+    {"t":"नशा","cat":"slang","w":3,"lang":"hi/mr","note":"nasha - generic word for intoxication/addiction, also used non-literally (songs, idioms); same false-positive shape as 'coke', see docs"},
+
+    {"t":"கஞ்சா","cat":"cannabis","w":5,"lang":"ta","note":"kanjaa/ganja"},
+    {"t":"சரக்கு","cat":"slang","w":4,"lang":"ta","note":"sarakku, lit. 'goods' - common euphemism"},
+    {"t":"வெள்ளை","cat":"slang","w":4,"lang":"ta","note":"vellai, 'white' - color-code slang, also just the color word; false-positive risk like 'coke'"},
+    {"t":"கருப்பு","cat":"slang","w":3,"lang":"ta","note":"karuppu, 'black' - color-code slang, also just the color word; false-positive risk like 'coke'"},
+    {"t":"போதை","cat":"slang","w":3,"lang":"ta","note":"bodhai - generic word for intoxication/high; false-positive risk like 'coke'"},
+
+    {"t":"গাঁজা","cat":"cannabis","w":5,"lang":"bn","note":"ganja"},
+    {"t":"নেশা","cat":"slang","w":3,"lang":"bn","note":"nesha - generic intoxication/addiction word, used non-literally too; false-positive risk like 'coke'"},
+
+    {"t":"గంజాయి","cat":"cannabis","w":5,"lang":"te","note":"ganjayi"},
+    {"t":"మత్తు","cat":"slang","w":3,"lang":"te","note":"mattu - generic intoxication/stupor word; false-positive risk like 'coke'"},
+
+    {"t":"ಗಾಂಜಾ","cat":"cannabis","w":5,"lang":"kn","note":"gaanja"},
+    {"t":"ಅಮಲು","cat":"slang","w":3,"lang":"kn","note":"amalu - generic intoxication word (e.g. 'under the influence'); false-positive risk like 'coke'"},
+
+    {"t":"കഞ്ചാവ്","cat":"cannabis","w":5,"lang":"ml","note":"kanchavu"},
+    {"t":"ലഹരി","cat":"slang","w":3,"lang":"ml","note":"lahari - generic intoxication/craze word, common in non-drug metaphor too; false-positive risk like 'coke'"},
+
+    {"t":"ગાંજો","cat":"cannabis","w":5,"lang":"gu","note":"ganjo"},
+    {"t":"ઘેન","cat":"slang","w":3,"lang":"gu","note":"ghen - generic drowsiness/intoxication word; false-positive risk like 'coke'"},
+
+    {"t":"ਭੁੱਕੀ","cat":"opioid","w":6,"lang":"pa","note":"bhukki - poppy husk, widely reported in Punjab opioid-abuse coverage"},
+    {"t":"ਚਰਸ","cat":"cannabis","w":5,"lang":"pa","note":"charas (Gurmukhi)"},
+    {"t":"ਨਸ਼ਾ","cat":"slang","w":3,"lang":"pa","note":"nasha (Gurmukhi) - generic intoxication/addiction word; false-positive risk like 'coke'"},
+
+    {"t":"چرس","cat":"cannabis","w":5,"lang":"ur","note":"charas (Perso-Arabic script)"},
+    {"t":"افیون","cat":"opioid","w":6,"lang":"ur","note":"afyun/opium"},
+    {"t":"نشہ","cat":"slang","w":3,"lang":"ur","note":"nasha (Perso-Arabic script) - generic intoxication word, extremely common in non-drug speech/song; false-positive risk like 'coke'"},
+
+    {"t":"ଗଞ୍ଜେଇ","cat":"cannabis","w":5,"lang":"or","note":"ganjei - LOWER CONFIDENCE spelling, please have a native Odia speaker verify before relying on this in production"},
+    {"t":"pillow","cat":"stimulant","w":3,"note":"Tamil Nadu cue word reported for cocaine (team-supplied); also an everyday word - weight kept low, escalates only with corroboration or repetition"},
+    {"t":"coollip","cat":"stimulant","w":4,"note":"cue word used as a cocaine replacement/substitute (team-supplied); Cool Lip is also a real tobacco product name - ambiguous"},
+    {"t":"cool lip","cat":"stimulant","w":4,"note":"spaced spelling of coollip - ambiguous"},
+    {"t":"sarakku","cat":"slang","w":3,"note":"Tamil romanized: 'goods'; also used for liquor - ambiguous"},
+    {"t":"saraku","cat":"slang","w":3,"note":"alternate romanization of sarakku - ambiguous"},
+    {"t":"corex","cat":"pharma","w":6,"note":"codeine cough syrup, widely reported as diverted/abused in India"},
+    {"t":"phensedyl","cat":"pharma","w":6,"note":"codeine cough syrup, widely reported as diverted/abused in India"},
+    {"t":"tidigesic","cat":"pharma","w":6,"note":"buprenorphine injection, reported as abused"},
+    {"t":"nitrosun","cat":"pharma","w":6,"note":"nitrazepam tablets, reported as abused"},
+    {"t":"nitrazepam","cat":"pharma","w":6},
+    {"t":"spasmoproxyvon","cat":"pharma","w":6,"note":"SP capsules, reported as abused"},
+    {"t":"avil","cat":"pharma","w":4,"note":"pheniramine injection, reported as abused; also an ordinary medicine - ambiguous"}
+  ],
+  "emoji": [
+    {"e":"❄️","cat":"cocaine","w":3},{"e":"💊","cat":"pills","w":3},
+    {"e":"🍁","cat":"cannabis","w":2},{"e":"🌿","cat":"cannabis","w":2},{"e":"🍄","cat":"psychedelic","w":3}
+  ],
+  "repeat": {
+    "threshold": 3,
+    "words": ["packet","packets","parcel","parcels","pillow","pillows","coollip","goods"]
+  },
+  "intent": ["available","deal","price","stock","delivery","cod","dm","pickup","gram","grams","kg","rate","supply","need","asked"]
+}
